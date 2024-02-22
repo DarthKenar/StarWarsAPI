@@ -1,0 +1,6 @@
+IDEAS.md
+/node_modules
+/dist
+*.tmp
+.vscode/
+Desktop.ini
