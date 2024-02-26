@@ -1,1 +1,0 @@
-export let prueba = (a:number, b:number):number => a + b;
