@@ -1,4 +1,4 @@
-# STAR WARS API para Cairox
+# STAR WARS API para Kairox
 
 ## Prueba Técnica
 
