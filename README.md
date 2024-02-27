@@ -1,11 +1,11 @@
 # STAR WARS API para Kairox
 
-## Prueba Técnica
-
 ## Objetivos
 
-    Utilizando la API STAR WARS, podrás obtener las películas y personajes de cada entrega.
-    (Requerido)
+Utilizando la [API STAR WARS](https://swapi.dev/documentation), podrás obtener las películas y personajes de cada entrega.
+(Requerido)
+
+---
 
 ### Desafío 1
 
@@ -18,6 +18,8 @@ Al consultar cada película esta tiene que guardar en una base local todos los p
 ### Desafío 3
 
 Crear un endpoint que borre los personajes de la película indicada de la base de datos. Crear un endpoint que borre TODOS los datos de la Base de datos.
+
+---
 
 #### Desafío Opcional (Bonus extra)
 
