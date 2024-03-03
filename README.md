@@ -36,3 +36,15 @@ Crear un endpoint que borre los personajes de la película indicada de la base d
 - Proponer diseño y lógica en cada desafío.
 - Se puede subir a github/gitlab y compartir el link o bien un zip.
 - Proponer manejo de errores (404, 401, 400, 500)
+
+Pasos para compilar la API
+
+- Clonar repositorio con:
+    Git bash:
+        -git clone <url del repo>
+- instar requerimientos:
+    terminal:
+        - npm install
+- compilar typescript:
+    terminal:
+        - npx tsc
