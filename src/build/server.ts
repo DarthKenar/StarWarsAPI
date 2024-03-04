@@ -1,31 +1,45 @@
 import { Request, Response } from 'express';
 
-const path = require("path")
+const PATH = require("path")
+const EXPRESS = require('express')
+const APP = EXPRESS()
+const PORT = 3000
 const EventEmitter = require("events")
-const express = require('express')
-const app = express()
-const port = 3000
 
 const requestStarWarsAPI = new EventEmitter()
 
 //Events Handlers
-requestStarWarsAPI.on("refillDB",()=>{
+requestStarWarsAPI.on("refillDB",(req:Request)=>{
   console.log("Event refillDB")
   //si db no existe
-  //realizar peticion a la API
+    //realizar peticion a la API
+})
+
+requestStarWarsAPI.on("refillObject",()=>{
+  requestStarWarsAPI.emit("refillDB")
+  //buscar ese objeto específico en la db.
+  //si no existe
+    //realizar peticion a la api de ese objeto en específico y guardarlo en la DB
 })
 
 const htmlFile = (file: string): string => {
-  return path.join(__dirname, '../public', file)
+  console.log(__dirname)
+  return PATH.join(__dirname, '../public', file)
 };
 
-app.get('/', (req:Request, res:Response) => {
-  requestStarWarsAPI.emit("refillDB")
-  res.sendFile(htmlFile("index.html"))
+APP.get('/', async (req:Request, res:Response) => {
+  await requestStarWarsAPI.emit("refillDB", req)
+  let context: string;
+  req.on("data",(info:JSON)=>{
+    console.log(typeof info)
+    context = info.toString()
+    res.end("context")
+  })
+  
 })
 
-app.listen(port, () => {
-  console.log(`Listening port ${port}`)
+APP.listen(PORT, () => {
+  console.log(`Listening port ${PORT}`)
 })
 
 
