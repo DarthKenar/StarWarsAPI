@@ -10,7 +10,11 @@
     <header>StarWars API Kairox</header>
     <main id="main">
         <h1>Bienvenido</h1>
-        <button hx-get="/">Entrar</button>
+        <button 
+        hx-get="/entrar"
+        hx-target="#main"
+        hx-swap="outerHTML"
+        >Entrar</button>
     </main>
 </body>
 </html>

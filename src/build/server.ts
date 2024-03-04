@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
-
+let ejs = require('ejs');
+let people = ['geddy', 'neil', 'alex'];
+let html = ejs.render('<%= people.join(", "); %>', {people: people});
 const AXIOS = require("axios")
 const PATH = require("path")
 const EXPRESS = require('express')
@@ -15,7 +17,8 @@ async function checkDB(res:Response) {
     console.log("updating DB")
   }else{
     try {
-      const response = await AXIOS.get('https://swapi.dev/api/');
+      var dataAPI = await AXIOS.get('https://swapi.dev/api/');
+      return dataAPI;
       //Guardar info en la base de datos
     } catch (error) {
       console.error(error);
@@ -26,14 +29,25 @@ async function checkDB(res:Response) {
 }
 
 const htmlFile = (file: string): string => {
-  console.log(__dirname)
   return PATH.join(__dirname, '../public', file)
 };
 
 APP.use(async (req:Request, res:Response) => {
   switch (req.method) {
     case "GET":
-      res.end(htmlFile("index.html"))
+      console.log(req.path)
+      switch (req.path) {
+        case "/":
+          checkDB(res);
+          res.sendFile(htmlFile("index.html"));
+          break;
+        case "/entrar":
+          var dataAPI = checkDB(res);
+          res.render(htmlFile("data.html"),{data: html})
+          break;
+        default:
+          break;
+      }
       break;
     case "DELETE":
     
@@ -44,8 +58,6 @@ APP.use(async (req:Request, res:Response) => {
       res.status(501).end(htmlFile("index.html"))
       
   }
-  await checkDB(res)
-  
 })
 
 APP.listen(PORT, () => {
