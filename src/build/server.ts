@@ -1,31 +1,40 @@
 import { Request, Response } from 'express';
 
-const path = require("path")
+const PATH = require("path")
 const EventEmitter = require("events")
-const express = require('express')
-const app = express()
-const port = 3000
+const EXPRESS = require('express')
+const APP = EXPRESS()
+const PORT = 3000
 
 const requestStarWarsAPI = new EventEmitter()
+
+async function checkDB() {
+  //reemplazar true por comprobacion de base de datos
+  if(true){
+    await console.log("updating DB")
+  }else{
+     //realizar peticion a la api
+    
+  }
+}
 
 //Events Handlers
 requestStarWarsAPI.on("refillDB",()=>{
   console.log("Event refillDB")
-  //si db no existe
-  //realizar peticion a la API
+  return checkDB()
 })
 
 const htmlFile = (file: string): string => {
-  return path.join(__dirname, '../public', file)
+  return PATH.join(__dirname, '../public', file)
 };
 
-app.get('/', (req:Request, res:Response) => {
+APP.get('/', (req:Request, res:Response) => {
   requestStarWarsAPI.emit("refillDB")
   res.sendFile(htmlFile("index.html"))
 })
 
-app.listen(port, () => {
-  console.log(`Listening port ${port}`)
+APP.listen(PORT, () => {
+  console.log(`Listening port ${PORT}`)
 })
 
 
