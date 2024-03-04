@@ -12,12 +12,12 @@ app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.set('views', PATH.join(__dirname, './views'));
 
-const requestStarWarsAPI = new EventEmitter()
+const requestStarWarsAPI = new EventEmitter();
 
 async function checkDB(res:Response) {
   // Condicional, existe información de peliculas en la base de datos.
   if(false){
-    console.log("updating DB")
+    console.log("updating DB");
   }else{
     try {
       var dataAPI = await AXIOS.get('https://swapi.dev/api/');
@@ -26,34 +26,34 @@ async function checkDB(res:Response) {
     } catch (error) {
       console.error(error);
       res.statusCode = 501;
-      console.error(res.statusCode)
+      console.error(res.statusCode);
       res.render("error",{
         error: `${res.statusCode}`,
         errorInfo: 'Bad Gateway'
-      })
+      });
     }
   }
 }
 
 const htmlFile = (file: string): string => {
-  return PATH.join(__dirname, '../public', file)
+  return PATH.join(__dirname, '../public', file);
 };
 
 app.use(async (req:Request, res:Response) => {
-  console.log(`Metodo: ${req.method}`)
-  console.log(`Path: ${req.path}`)
+  console.log(`Metodo: ${req.method}`);
+  console.log(`Path: ${req.path}`);
   switch (req.method) {
     case "GET":
-      console.log(req.path)
+      console.log(req.path);
       switch (req.path) {
         case "/":
           checkDB(res);
-          res.render("home",{})
-          break
+          res.render("home",{});
+          break;
         case "/entrar":
           let dataAPI = await AXIOS.get('https://swapi.dev/api/');
-          console.log(dataAPI)
-          res.render("info",dataAPI)
+          console.log(dataAPI);
+          res.render("info",dataAPI);
           break;
         default:
           break;
@@ -64,14 +64,15 @@ app.use(async (req:Request, res:Response) => {
 
     default:
       res.statusCode = 501;
-      console.error(res.statusCode)
-      res.status(501).end(htmlFile("index.html"))
+      console.error(res.statusCode);
+      res.status(501).end(htmlFile("index.html"));
       
   }
-})
+});
 
 app.listen(PORT, () => {
-  console.log(`Listening port ${PORT}`)
-})
+  console.log(`Listening port ${PORT}`);
+});
+
 
 
