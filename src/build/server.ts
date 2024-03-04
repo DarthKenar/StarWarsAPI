@@ -12,20 +12,20 @@ app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.set('views', PATH.join(__dirname, './views'));
 
-const requestStarWarsAPI = new EventEmitter();
-
 async function checkDB(res:Response) {
+  /*Chequea la base de datos y si no tiene películas las completa con la API externa*/
   // Condicional, existe información de peliculas en la base de datos.
   if(false){
     console.log("updating DB");
   }else{
     try {
-      var dataAPI = await AXIOS.get('https://swapi.dev/api/');
+      var dataAPI = await AXIOS.get('https://swapi.dev/api/films');
+      dataAPI = dataAPI.data
       console.log("Informacion obtenida de 'https://swapi.dev/api/' correctamente.");
       //Guardar info en la base de datos
     } catch (error) {
       console.error(error);
-      res.statusCode = 501;
+      res.statusCode = 502;
       console.error(res.statusCode);
       res.render("error",{
         error: `${res.statusCode}`,
@@ -34,10 +34,6 @@ async function checkDB(res:Response) {
     }
   }
 }
-
-const htmlFile = (file: string): string => {
-  return PATH.join(__dirname, '../public', file);
-};
 
 app.use(async (req:Request, res:Response) => {
   console.log(`Metodo: ${req.method}`);
@@ -51,11 +47,19 @@ app.use(async (req:Request, res:Response) => {
           res.render("home",{});
           break;
         case "/entrar":
-          let dataAPI = await AXIOS.get('https://swapi.dev/api/');
-          console.log(dataAPI);
+          //cargar peliculas (todas)
+          var dataAPI = await AXIOS.get('https://swapi.dev/api/films');
+          dataAPI = dataAPI.data
+          console.log(dataAPI)
           res.render("info",dataAPI);
           break;
         default:
+          res.statusCode = 404;
+          console.error(res.statusCode);
+          res.render("error",{
+            error: `${res.statusCode}`,
+            errorInfo: 'Not found'
+          });
           break;
       }
       break;
@@ -65,7 +69,11 @@ app.use(async (req:Request, res:Response) => {
     default:
       res.statusCode = 501;
       console.error(res.statusCode);
-      res.status(501).end(htmlFile("index.html"));
+      res.render("error",{
+        error: `${res.statusCode}`,
+        errorInfo: 'Bad Gateway'
+      });
+      break;
       
   }
 });
