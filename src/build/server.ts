@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-let ejs = require('ejs');
+let ejs = require('ejs'); //EJS, Handlebars o Pug
 let people = ['geddy', 'neil', 'alex'];
 let html = ejs.render('<%= people.join(", "); %>', {people: people});
 const AXIOS = require("axios")
