@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 
+const AXIOS = require("axios")
 const PATH = require("path")
 const EXPRESS = require('express')
 const APP = EXPRESS()
@@ -8,43 +9,42 @@ const EventEmitter = require("events")
 
 const requestStarWarsAPI = new EventEmitter()
 
-async function checkDB() {
+async function checkDB(res:Response) {
   //reemplazar true por comprobacion de base de datos
-  if(true){
-    await console.log("updating DB")
+  if(false){
+    console.log("updating DB")
   }else{
-     //realizar peticion a la api
-    
+    try {
+      const response = await AXIOS.get('https://swapi.dev/api/');
+      //Guardar info en la base de datos
+    } catch (error) {
+      console.error(error);
+      res.status(500).end("Error al realizar la solicitud a la API externa");
+
+    }
   }
 }
-
-//Events Handlers
-requestStarWarsAPI.on("refillDB",(req:Request)=>{
-  console.log("Event refillDB")
-  //si db no existe
-    //realizar peticion a la API
-})
-
-requestStarWarsAPI.on("refillObject",()=>{
-  requestStarWarsAPI.emit("refillDB")
-  //buscar ese objeto específico en la db.
-  //si no existe
-    //realizar peticion a la api de ese objeto en específico y guardarlo en la DB
-})
 
 const htmlFile = (file: string): string => {
   console.log(__dirname)
   return PATH.join(__dirname, '../public', file)
 };
 
-APP.get('/', async (req:Request, res:Response) => {
-  await requestStarWarsAPI.emit("refillDB", req)
-  let context: string;
-  req.on("data",(info:JSON)=>{
-    console.log(typeof info)
-    context = info.toString()
-    res.end("context")
-  })
+APP.use(async (req:Request, res:Response) => {
+  switch (req.method) {
+    case "GET":
+      res.end(htmlFile("index.html"))
+      break;
+    case "DELETE":
+    
+      break;
+
+    default:
+      console.error(501)
+      res.status(501).end(htmlFile("index.html"))
+      
+  }
+  await checkDB(res)
   
 })
 
