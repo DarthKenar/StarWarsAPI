@@ -22,6 +22,9 @@ export class Films {
 export class People {
 
     @PrimaryGeneratedColumn()
+    id: number
+
+    @Column()
     name: string
 
     @Column()
