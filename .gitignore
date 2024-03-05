@@ -1,6 +1,7 @@
 IDEAS.md
 /node_modules
-/dist
+/dist/build
+/dist/database
 *.tmp
 .vscode/
 Desktop.ini
