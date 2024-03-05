@@ -38,28 +38,27 @@ async function refillDB(res:Response){
       film.title = filmAPI.title
       film.episode_id = filmAPI.episode_id
       await AppDataSource.manager.save(film)
-      //busco todos los persojaes de esa pelicula y los guardo en la base de datos. al finalizar 
-      //Si ya existe el personaje entonces simplemente agrego a su lista ManyToMany de peliculas la pelicula actual
-      console.log("Longitud de la cantidad de people en la película --", filmAPI.characters.length)
       for(let j = 0; j < filmAPI.characters.length; j++){
         let characterAPI = await AXIOS.get(filmAPI.characters[j]);
-        console.log(characterAPI.data)
         let peopleRepository = await AppDataSource.getRepository(People)
         let characterDB = await peopleRepository.findOneBy({name: characterAPI.data.name})
         if(characterDB){
           //Si existe entonces solo agregar la pelicula a su repertorio
-          characterDB.films.push(film)
-          film.characters.push(characterDB)
+          console.log("EL PERSONAJE YA EXISTE")
         }else{
           let people = new People()
           people.name = characterAPI.data.name
           people.gender = characterAPI.data.gender
-          people.species = await AXIOS.get(characterAPI.data.species[0]).data.name
+          console.log("ANTES")
+          // let GetSpecie = await AXIOS.get(characterAPI.data.species[j])
+          // console.log(GetSpecie.data.name)
+          // people.species = GetSpecie.data.name
+          people.species = "rellenar"
+          console.log("DESPUES")
           people.films = [film]
-          await AppDataSource.manager.save(people)
+          AppDataSource.manager.save(people)
           console.log("PERSONAJE GUARDADO")
           console.log(people.name)
-          film.characters.push(people)
         }
       };
       await AppDataSource.manager.save(film)
