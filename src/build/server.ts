@@ -45,20 +45,23 @@ async function refillDB(res:Response){
         if(characterDB){
           //Si existe entonces solo agregar la pelicula a su repertorio
           console.log("EL PERSONAJE YA EXISTE")
+          // characterDB.films.push(film)
         }else{
           let people = new People()
+          people.idAPI = filmAPI.characters[j].split('/')[filmAPI.characters[j].split('/').length - 2]
           people.name = characterAPI.data.name
           people.gender = characterAPI.data.gender
           console.log("ANTES")
-          // let GetSpecie = await AXIOS.get(characterAPI.data.species[j])
-          // console.log(GetSpecie.data.name)
-          // people.species = GetSpecie.data.name
-          people.species = "rellenar"
-          console.log("DESPUES")
+          try{
+            
+            // let specieURL = characterAPI.data.species[0]
+            let specie = await AXIOS.get(characterAPI.data.species[0])
+            people.species = await specie.data.name
+          }catch(err){
+            people.species = "undefined"
+          }
           people.films = [film]
           AppDataSource.manager.save(people)
-          console.log("PERSONAJE GUARDADO")
-          console.log(people.name)
         }
       };
       await AppDataSource.manager.save(film)

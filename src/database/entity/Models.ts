@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, PrimaryColumn, Column, ManyToMany, JoinTable } from "typeorm"
 
 @Entity()
 export class Films {
@@ -21,8 +21,8 @@ export class Films {
 @Entity()
 export class People {
 
-    @PrimaryGeneratedColumn()
-    id: number
+    @PrimaryColumn()
+    idAPI: number
 
     @Column()
     name: string
