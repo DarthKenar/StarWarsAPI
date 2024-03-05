@@ -54,7 +54,6 @@ async function refillDB(res:Response){
           console.log("ANTES")
           try{
             
-            // let specieURL = characterAPI.data.species[0]
             let specie = await AXIOS.get(characterAPI.data.species[0])
             people.species = await specie.data.name
           }catch(err){
