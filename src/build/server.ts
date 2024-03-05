@@ -7,7 +7,7 @@ var db = {
   "previous": null, 
   "results": [
       {
-          "title": "hola", 
+          "title": "A New Hope", 
           "episode_id": 4, 
           "opening_crawl": "It is a period of civil war.\r\nRebel spaceships, striking\r\nfrom a hidden base, have won\r\ntheir first victory against\r\nthe evil Galactic Empire.\r\n\r\nDuring the battle, Rebel\r\nspies managed to steal secret\r\nplans to the Empire's\r\nultimate weapon, the DEATH\r\nSTAR, an armored space\r\nstation with enough power\r\nto destroy an entire planet.\r\n\r\nPursued by the Empire's\r\nsinister agents, Princess\r\nLeia races home aboard her\r\nstarship, custodian of the\r\nstolen plans that can save her\r\npeople and restore\r\nfreedom to the galaxy....", 
           "director": "George Lucas", 
@@ -557,15 +557,18 @@ app.use(async (req:Request, res:Response) => {
       if (req.path.startsWith("/films")) {
         const title = req.path.split("/")[2];
         if (!title) {
+          console.log(req)
           res.render("infoTemplate", {results: db.results, searchFilm: true});
         } else {
-          console.log("Parametro buscado:", title)
-          res.render("infoTemplate",{results: db.results.filter(film => (film.title).toUpperCase().includes(title.toUpperCase()))})
+          console.log("Parametro buscado:", req.query.searchFilm)
+          let param:string = String(req.query.searchFilm);
+          res.render("infoTemplate",{results: db.results.filter(film => (film.title).toUpperCase().includes(param.toUpperCase()))})
         }
       } else {
         switch (req.path) {
           case "/":
             checkDB(res);
+            console.log(req)
             res.sendFile(htmlFile("index.html"));
             break;
           default:
