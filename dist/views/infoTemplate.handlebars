@@ -1,0 +1,14 @@
+{{#if searchFilm}}
+   <input type="search" name="searchFilm" id="searchFilm" hx-get="/films/ho" hx-trigger="keyup changed delay:300ms, search" hx-target="#main" hx-swap="outerHTML">
+{{/if}}
+<main id="main">
+    {{#if results}}
+        {{#each results}}
+            <h1>Título: {{this.title}}</h1>
+            <h2>Episodio: {{this.episode_id}}</h2>
+            <a href="{{url}}" target="_blank">+ Info</a>
+        {{/each}}
+    {{else}}
+        <h1>No se encontraron resultados</h1>
+    {{/if}}
+</main>

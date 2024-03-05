@@ -1,0 +1,10 @@
+{{!-- Enviado por SendError Function --}}
+<main id="main">
+    <h1>Codigo de error: {{error}}</h1>
+    <p>{{errorInfo}}</p>
+    <button 
+    hx-get="/"
+    hx-target="#main"
+    hx-swap="outerHTML"
+    >Volver</button>
+</main>
