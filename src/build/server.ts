@@ -1,3 +1,4 @@
+import "reflect-metadata"
 import express from 'express';
 import { Request, Response } from 'express';
 import { engine } from 'express-handlebars';
