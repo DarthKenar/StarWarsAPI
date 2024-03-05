@@ -94,14 +94,21 @@ AppDataSource.initialize()
           console.log("req.path: ", req.path);
           console.log("req.params: ", req.params)
           if (req.path.startsWith("/films")) {
+            let filmsRepository = await AppDataSource.getRepository(Films)
             const title = req.path.split("/")[2];
             if (!title) {
-              res.render("infoTemplate");
+              let param = await filmsRepository.find()
+              res.render("infoTemplate", {results: param, searchFilm: true});
             } else {
               console.log("Parametro buscado:", req.query.searchFilm)
               let param:string = String(req.query.searchFilm);
-              //{results: db.results.filter(film => (film.title).toUpperCase().includes(param.toUpperCase()))}
-              res.render("infoTemplate")
+              //https://www.tutorialspoint.com/typeorm/typeorm_query_builder.htm
+              //https://typeorm.io/#using-querybuilder
+              let films = await filmsRepository
+                .createQueryBuilder("film")
+                .where("LOWER(film.title) LIKE LOWER(:title)", { title: `%${param}%` })
+                .getMany();
+              res.render("infoTemplate",{results: films})
             }
           } else {
             switch (req.path) {
