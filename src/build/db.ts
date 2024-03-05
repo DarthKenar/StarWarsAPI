@@ -1,1 +1,0 @@
-//realizar conexion con base de datos SQLite
