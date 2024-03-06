@@ -12,9 +12,19 @@ export class Films {
     @Column()
     episode_id: number
 
-    @ManyToMany(type => People, people => people.films)
-    @JoinTable()
-    characters: People[]
+}
+
+@Entity()
+export class PeopleInFilms {
+    
+    @PrimaryGeneratedColumn()
+    id: number
+
+    @Column()
+    film_id: number
+
+    @Column()
+    people_id: number
 
 }
 
@@ -32,9 +42,5 @@ export class People {
 
     @Column()
     species: string
-
-    @ManyToMany(type => Films, film => film.characters)
-    @JoinTable()
-    films: Films[]
     
 }

@@ -13,7 +13,14 @@
         {{#if film}}
             <a href="/films">Volver</a>
             <h1>Título: {{film.title}}</h1>
-            <h2>Episodio: {{film.episode_id}}</h2>
+            <h2>Episodio: <span id="episode_id" name="episode_id">{{film.episode_id}}</span></h2>
+            <button hx-delete="/delete/episode_id" hx-target="#main" hx-swap="outerHTML">Eliminar Personajes</button>
+            {{#each characters}}
+                <h3>Nombre: {{this.name}}</h3>
+                <h4>Género: {{this.gender}}</h4>
+                <h4>Especie: {{this.species}}</h4>
+            {{/each}}
+            
         {{else}}
             <h1>No se encontraron resultados</h1>
         {{/if}}
