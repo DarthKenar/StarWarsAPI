@@ -16,26 +16,24 @@ app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.set('views', PATH.join(__dirname, '../views'));
 
-const htmlFile = (file: string): string => {
-  return PATH.join(__dirname, '../public', file);
-};
 
-function sendError(res:Response, codeError:number, errorInfo:string){
-  console.error(res.statusCode);
-  res.statusCode = codeError;
-  res.render("errorTemplate",{
-    error: `${codeError}`,
-    errorInfo: errorInfo
-  });
-};
+
 
 
 
 AppDataSource.initialize()
   .then(() => {
+    function sendError(res:Response, codeError:number, errorInfo:string){
+      console.error(res.statusCode);
+      res.statusCode = codeError;
+      res.render("errorTemplate",{
+        error: `${codeError}`,
+        errorInfo: errorInfo
+      });
+    };
     async function refillDB(res:Response){
       try {
-        var filmsAPI = await AXIOS.get("https://swapi.dev/api/films");
+        let filmsAPI = await AXIOS.get("https://swapi.dev/api/films");
         for(let i = 0; i < filmsAPI.data.results.length; i++){
           let filmAPI = filmsAPI.data.results[i]
           //obtener pelicula de la base de datos
