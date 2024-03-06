@@ -1,9 +1,8 @@
-{{#if searchFilm}}
-   <input type="search" name="searchFilm" id="searchFilm" hx-get="/films/search" hx-trigger="keyup changed delay:300ms, search" hx-target="#main" hx-swap="outerHTML">
-{{/if}}
+{{>searchFilm}}
 <main id="main">
     {{>checkedDB}}
     {{#if results}}
+        <button hx-delete="/delete/all" hx-target="#main" hx-swap="outerHTML">Borrar Todo</button>
         {{#each results}}
             <h1>Título: {{this.title}}</h1>
             <h2>Episodio: {{this.episode_id}}</h2>
@@ -20,7 +19,6 @@
                 <h4>Género: {{this.gender}}</h4>
                 <h4>Especie: {{this.species}}</h4>
             {{/each}}
-            
         {{else}}
             <h1>No se encontraron resultados</h1>
         {{/if}}

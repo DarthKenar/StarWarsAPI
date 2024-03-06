@@ -58,7 +58,10 @@ AppDataSource.initialize()
               let characterDB = await peopleRepository.findOneBy({name: characterAPI.data.name})
               let characterID = filmAPI.characters[j].split('/')
               let idAPI:number = Number(characterID[characterID.length - 2])
+              let peopleInFilms = new PeopleInFilms()
+              peopleInFilms.film_id = film.episode_id
               if(characterDB){
+                peopleInFilms.people_id = characterDB.idAPI
                 //Si existe entonces solo agregar la pelicula a su repertorio
                 console.log("EL PERSONAJE YA EXISTE")
                 // characterDB.films.push(film)
@@ -78,17 +81,13 @@ AppDataSource.initialize()
                   people.species = "undefined"
                   console.log("Especie indefinida Agregada!")
                 }
-
                 //Guardamos la relacion ManyToMany
-                let peopleInFilms = new PeopleInFilms()
-                peopleInFilms.film_id = film.episode_id
                 peopleInFilms.people_id = people.idAPI
-                await AppDataSource.manager.save(peopleInFilms)
                 console.log("Guardando Personaje...")
                 AppDataSource.manager.save(people)
-                
                 console.log("Personaje Guardado!")
               }
+              await AppDataSource.manager.save(peopleInFilms)
             };
             await AppDataSource.manager.save(film)
             console.log(`PELICULA ${film.title} GUARDADA!`)
@@ -118,13 +117,12 @@ AppDataSource.initialize()
     app.use(async (req:Request, res:Response) => {
       console.log(`Metodo: ${req.method}`);
       console.log(`Path: ${req.path}`);
-      checkDB(res);
       let filmsRepository = await AppDataSource.getRepository(Films)
       let peopleRepository = await AppDataSource.getRepository(People)
       let peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
       switch (req.method) {
         case "GET":
-
+          checkDB(res);
           console.log("req.path: ", req.path);
           console.log("req.params: ", req.params)
           let param:string = req.path.split("/")[2];
@@ -190,7 +188,7 @@ AppDataSource.initialize()
 
               chekedCompleteDB = false;
               chekedDB = false;
-              res.render("homeTemplate", {chekedCompleteDB: chekedCompleteDB});
+              res.render("infoTemplate",);
               break;
 
             case "/delete/episode_id":
@@ -208,7 +206,7 @@ AppDataSource.initialize()
                   await AppDataSource.manager.save(film)
                   chekedCompleteDB = false;
                   chekedDB = false;
-                  res.render("homeTemplate", {chekedCompleteDB: chekedCompleteDB});
+                  res.render("infoTemplate", {chekedCompleteDB: chekedCompleteDB});
                 }else{
                   throw new Error('Bad Request');
                 }
