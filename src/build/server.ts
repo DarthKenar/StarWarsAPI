@@ -12,7 +12,7 @@ const PATH = require("path")
 const PORT = process.env.PORT || 3000
 const EventEmitter = require("events")
 var chekedDB:boolean = false; //Bandera para comprobacion de DB
-var chekedCompleteDB = false; //Muestra o no al cliente si se ha terminado el guardado en la DB
+var chekedCompleteDB:boolean = false; //Muestra o no al cliente si se ha terminado el guardado en la DB
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.set('views', PATH.join(__dirname, '../views'));
@@ -74,6 +74,7 @@ async function refillDB(res:Response){
       await AppDataSource.manager.save(film)
       console.log(`PELICULA ${film.title} GUARDADA!`)
     }
+    chekedCompleteDB = true; //Se completo la DB
   } catch (error) {
     sendError(res,502,'Bad Gateway');
   }
@@ -92,7 +93,8 @@ AppDataSource.initialize()
         console.log("La base de datos se completará")
         chekedDB = true
         console.log(`BANDERA DE DB (checkedDB)--> ${chekedDB}`)
-        refillDB(res);
+        await refillDB(res);
+      }else{
         chekedCompleteDB = true; //Se completo la DB
       }
     }
@@ -109,6 +111,7 @@ AppDataSource.initialize()
             let filmsRepository = await AppDataSource.getRepository(Films)
             if (!param) {
               let param = await filmsRepository.find()
+              console.log("chekedCompleteDB --> ",chekedCompleteDB)
               res.render("infoTemplate", {results: param, searchFilm: true, chekedCompleteDB: chekedCompleteDB});
             } else {
               console.log("Parametro buscado:", req.query.searchFilm)
@@ -119,13 +122,15 @@ AppDataSource.initialize()
                 .createQueryBuilder("film")
                 .where("LOWER(film.title) LIKE LOWER(:title)", { title: `%${someFilmParam}%` })
                 .getMany();
-              res.render("infoTemplate",{results: films})
+              console.log("chekedCompleteDB --> ",chekedCompleteDB)
+              res.render("infoTemplate",{results: films, chekedCompleteDB: chekedCompleteDB})
             }
           } else if (req.path.startsWith("/film/")){
             let oneFilmParam:number = parseInt(param)
             let filmsRepository = await AppDataSource.getRepository(Films)
             let film = await filmsRepository.findOneBy({episode_id: oneFilmParam})
-            res.render("infoTemplate",{film: film})
+            
+            res.render("infoTemplate",{film: film, chekedCompleteDB: chekedCompleteDB})
           } else {
             switch (req.path) {
               case "/":
@@ -150,7 +155,7 @@ AppDataSource.initialize()
     
     app.listen(PORT, () => {
       
-      console.log(`Escuchando en puerto ${PORT}...`);
+      console.log(`Escuchando en puerto http://localhost:${PORT}...`);
     });
 
   })
