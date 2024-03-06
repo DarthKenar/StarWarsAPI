@@ -11,6 +11,7 @@ const AXIOS = require("axios")
 const PATH = require("path")
 const PORT = process.env.PORT || 3000
 const EventEmitter = require("events")
+var chekedDB:boolean = false; //Bandera para comprobacion de DB
 
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
@@ -37,6 +38,7 @@ async function refillDB(res:Response){
       let filmAPI = filmsAPI.data.results[i]
       let film = new Films()
       film.title = filmAPI.title
+      console.log(`CREANDO PELICULA NUEVA...${filmAPI.title}`)
       film.episode_id = filmAPI.episode_id
       await AppDataSource.manager.save(film)
       for(let j = 0; j < filmAPI.characters.length; j++){
@@ -48,45 +50,53 @@ async function refillDB(res:Response){
           console.log("EL PERSONAJE YA EXISTE")
           // characterDB.films.push(film)
         }else{
+          console.log("CREANDO NUEVA PERSONA...")
           let people = new People()
           people.idAPI = filmAPI.characters[j].split('/')[filmAPI.characters[j].split('/').length - 2]
           people.name = characterAPI.data.name
           people.gender = characterAPI.data.gender
-          console.log("ANTES")
           try{
-            
+            console.log("Buscando especie...")
             let specie = await AXIOS.get(characterAPI.data.species[0])
             people.species = await specie.data.name
+            console.log(`Especie agregada: ${specie.data.name}`)
           }catch(err){
+            console.error("La especie no se encuentra!")
             people.species = "undefined"
+            console.log("Especie indefinida Agregada!")
           }
-          people.films = [film]
+          // people.films = [film]
+          console.log("Guardando Personaje...")
           AppDataSource.manager.save(people)
+          console.log("Personaje Guardado!")
         }
       };
       await AppDataSource.manager.save(film)
-      console.log("PELICULA GUARDADA")
-      console.log(film.title)
+      console.log(`PELICULA ${film.title} GUARDADA!`)
     }
   } catch (error) {
     sendError(res,502,'Bad Gateway');
   }
 }
 
-async function checkDB(res:Response) {
-  /*Chequea la base de datos y si no tiene películas las completa con la API externa*/
-  // Condicional, existe información de peliculas en la base de datos.
-  //Obtener lista de peliculas
-  const filmsRepository = AppDataSource.getRepository(Films)
-  const savedFilms = await filmsRepository.find()
-  if(savedFilms.length === 0){
-    refillDB(res);
-  }
-}
+
 
 
 AppDataSource.initialize()
   .then(() => {
+    async function checkDB(res:Response) {
+      /*Chequea la base de datos y si no tiene películas las completa con la API externa*/
+      // Condicional, existe información de peliculas en la base de datos.
+      //Obtener lista de peliculas
+      console.log(`BANDERA DE DB (checkedDB)--> ${chekedDB}`)
+      if(chekedDB === false){
+        console.log("La base de datos se completará")
+        chekedDB = true
+        console.log(`BANDERA DE DB (checkedDB)--> ${chekedDB}`)
+        refillDB(res);
+      }
+    }
+
     app.use(async (req:Request, res:Response) => {
       console.log(`Metodo: ${req.method}`);
       console.log(`Path: ${req.path}`);
@@ -119,6 +129,7 @@ AppDataSource.initialize()
           } else {
             switch (req.path) {
               case "/":
+                console.log("Chequeando DB")
                 checkDB(res);
                 res.sendFile(htmlFile("index.html"));
                 break;
@@ -138,6 +149,7 @@ AppDataSource.initialize()
     });
     
     app.listen(PORT, () => {
+      
       console.log(`Escuchando en puerto ${PORT}...`);
     });
 
