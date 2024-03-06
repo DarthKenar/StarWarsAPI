@@ -1,8 +1,10 @@
-{{!-- <main id="main">
+{{!-- Enviado por consulta a la raíz "/" --}}
+<main id="main">
+    {{>checkedDB}}
     <h1>Bienvenido</h1>
     <button 
     hx-get="/films"
     hx-target="#main"
     hx-swap="outerHTML"
     >Entrar</button>
-</main> --}}
+</main>

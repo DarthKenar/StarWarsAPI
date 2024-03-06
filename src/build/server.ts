@@ -79,9 +79,6 @@ async function refillDB(res:Response){
   }
 }
 
-
-
-
 AppDataSource.initialize()
   .then(() => {
     async function checkDB(res:Response) {
@@ -89,7 +86,9 @@ AppDataSource.initialize()
       // Condicional, existe información de peliculas en la base de datos.
       //Obtener lista de peliculas
       console.log(`BANDERA DE DB (checkedDB)--> ${chekedDB}`)
-      if(chekedDB === false){
+      const filmsRepository = AppDataSource.getRepository(Films)
+      const savedFilms = await filmsRepository.find()
+      if(chekedDB === false && savedFilms.length === 0){
         console.log("La base de datos se completará")
         chekedDB = true
         console.log(`BANDERA DE DB (checkedDB)--> ${chekedDB}`)
@@ -132,7 +131,7 @@ AppDataSource.initialize()
               case "/":
                 console.log("Chequeando DB")
                 checkDB(res);
-                res.sendFile(htmlFile("index.html"));
+                res.render("homeTemplate", {chekedCompleteDB: chekedCompleteDB});
                 break;
               default:
                 sendError(res,404,'Not found');

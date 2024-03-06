@@ -2,15 +2,12 @@
    <input type="search" name="searchFilm" id="searchFilm" hx-get="/films/search" hx-trigger="keyup changed delay:300ms, search" hx-target="#main" hx-swap="outerHTML">
 {{/if}}
 <main id="main">
-    {{#unless chekedCompleteDB}}
-        <h3>La base de datos se está completando...</h3>
-        <p>Puede que mientras tanto no encuentres lo que buscas..</p>
-    {{/unless}}
+    {{>checkedDB}}
     {{#if results}}
         {{#each results}}
             <h1>Título: {{this.title}}</h1>
             <h2>Episodio: {{this.episode_id}}</h2>
-            <a href="/film/{{this.episode_id}}" target="_blank">+ Info</a>
+            <a href="/film/{{this.episode_id}}">+ Info</a>
         {{/each}}
     {{else}}
         {{#if film}}
