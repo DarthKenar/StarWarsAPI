@@ -12,7 +12,7 @@ const PATH = require("path")
 const PORT = process.env.PORT || 3000
 const EventEmitter = require("events")
 var chekedDB:boolean = false; //Bandera para comprobacion de DB
-
+var chekedCompleteDB = false; //Muestra o no al cliente si se ha terminado el guardado en la DB
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.set('views', PATH.join(__dirname, '../views'));
@@ -94,6 +94,7 @@ AppDataSource.initialize()
         chekedDB = true
         console.log(`BANDERA DE DB (checkedDB)--> ${chekedDB}`)
         refillDB(res);
+        chekedCompleteDB = true; //Se completo la DB
       }
     }
 
@@ -109,7 +110,7 @@ AppDataSource.initialize()
             let filmsRepository = await AppDataSource.getRepository(Films)
             if (!param) {
               let param = await filmsRepository.find()
-              res.render("infoTemplate", {results: param, searchFilm: true});
+              res.render("infoTemplate", {results: param, searchFilm: true, chekedCompleteDB: chekedCompleteDB});
             } else {
               console.log("Parametro buscado:", req.query.searchFilm)
               let someFilmParam:string = String(req.query.searchFilm);
@@ -125,7 +126,7 @@ AppDataSource.initialize()
             let oneFilmParam:number = parseInt(param)
             let filmsRepository = await AppDataSource.getRepository(Films)
             let film = await filmsRepository.findOneBy({episode_id: oneFilmParam})
-            res.render("infoTemplate",{results: film})
+            res.render("infoTemplate",{film: film})
           } else {
             switch (req.path) {
               case "/":
