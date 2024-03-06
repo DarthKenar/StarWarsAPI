@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 import { engine } from 'express-handlebars';
 import { AppDataSource } from "../database/data-source";
 import { Films, People } from "../database/entity/Models";
+import { IntegerType } from "typeorm";
 
 const app = express()
 const AXIOS = require("axios")
@@ -93,23 +94,28 @@ AppDataSource.initialize()
         case "GET":
           console.log("req.path: ", req.path);
           console.log("req.params: ", req.params)
+          let param:string = req.path.split("/")[2];
           if (req.path.startsWith("/films")) {
             let filmsRepository = await AppDataSource.getRepository(Films)
-            const title = req.path.split("/")[2];
-            if (!title) {
+            if (!param) {
               let param = await filmsRepository.find()
               res.render("infoTemplate", {results: param, searchFilm: true});
             } else {
               console.log("Parametro buscado:", req.query.searchFilm)
-              let param:string = String(req.query.searchFilm);
+              let someFilmParam:string = String(req.query.searchFilm);
               //https://www.tutorialspoint.com/typeorm/typeorm_query_builder.htm
               //https://typeorm.io/#using-querybuilder
               let films = await filmsRepository
                 .createQueryBuilder("film")
-                .where("LOWER(film.title) LIKE LOWER(:title)", { title: `%${param}%` })
+                .where("LOWER(film.title) LIKE LOWER(:title)", { title: `%${someFilmParam}%` })
                 .getMany();
               res.render("infoTemplate",{results: films})
             }
+          } else if (req.path.startsWith("/film/")){
+            let oneFilmParam:number = parseInt(param)
+            let filmsRepository = await AppDataSource.getRepository(Films)
+            let film = await filmsRepository.findOneBy({episode_id: oneFilmParam})
+            res.render("infoTemplate",{results: film})
           } else {
             switch (req.path) {
               case "/":
