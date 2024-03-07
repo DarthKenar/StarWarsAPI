@@ -85,8 +85,8 @@ AppDataSource.initialize()
     async function refillPeopleForThisFilm(res:Response, id:number) {
       let characters = await getPeopleIdWhitFilmId(id)
       console.log(characters)
-      console.log("************************************")
       if(characters.length === 0){
+        console.log(!chekingPeopleForThisFilms.includes(id))
         if(!chekingPeopleForThisFilms.includes(id)){
           console.log("************************************")
           chekingPeopleForThisFilms.push(id)
@@ -224,7 +224,11 @@ AppDataSource.initialize()
                   .from(People)
                   .where("id IN (:...charactersIdsToDelete)", { charactersIdsToDelete })
                   .execute();
-                  
+                await peopleInFilmsRepository.createQueryBuilder()
+                  .delete()
+                  .from(PeopleInFilms)
+                  .where("people_id IN (:...charactersIdsToDelete)", { charactersIdsToDelete })
+                  .execute();
                 await updateCharactersStatus(film.id,false)
                 console.log("-----------------------------------------------------------")
                 await AppDataSource.manager.save(peopleRepository)
