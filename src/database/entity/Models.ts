@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, PrimaryColumn, Column, ManyToMany, Join
 @Entity()
 export class Films {
 
-    @PrimaryGeneratedColumn()
+    @PrimaryColumn()
     id: number
 
     @Column()
@@ -32,7 +32,7 @@ export class PeopleInFilms {
 export class People {
 
     @PrimaryColumn()
-    idAPI: number
+    id: number
 
     @Column()
     name: string

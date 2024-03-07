@@ -9,8 +9,8 @@ const app = express()
 const AXIOS = require("axios")
 const PATH = require("path")
 const PORT = process.env.PORT || 3000
-var chekedDB:boolean = false; //Bandera para comprobacion de DB
-var chekedCompleteDB:boolean = false; //Muestra o no al cliente si se ha terminado el guardado en la DB
+var chekingFilms:boolean = false; //Bandera para que no se repita el rellenado de las películas
+var chekingPeopleForThisFilms:number[] = []; //Bandera para que no se repita el rellenado de los personajes en una película
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.set('views', PATH.join(__dirname, '../views'));
@@ -18,7 +18,7 @@ app.set('views', PATH.join(__dirname, '../views'));
 AppDataSource.initialize()
   .then(() => {
 
-    async function findAllIdsPeopleForThisFilm(episode_id:number){
+    async function getPeopleIdWhitEpisodeId(episode_id:number){
       try{
         let peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
         let peopleInFilms = await peopleInFilmsRepository.findBy({film_id: episode_id})
@@ -27,7 +27,6 @@ AppDataSource.initialize()
       }catch(err){
         console.log(err)
       }
-
     }
 
     function sendError(res:Response, codeError:number, errorInfo:string){
@@ -39,82 +38,92 @@ AppDataSource.initialize()
       });
     };
 
-    async function refillDB(res:Response){
-      try {
-        let filmsAPI = await AXIOS.get("https://swapi.dev/api/films");
-        for(let i = 0; i < filmsAPI.data.results.length; i++){
-          let filmAPI = filmsAPI.data.results[i]
-          //obtener pelicula de la base de datos
+    async function refillFilmsInDB(res:Response){
+      //Completa la base de datos con las películas de la API
+      if(!chekingFilms){
+        chekingFilms = true;
+        try{
+          let filmsAPI = await AXIOS.get("https://swapi.dev/api/films");
           let filmRepository = await AppDataSource.getRepository(Films)
-          let episode_id = await filmRepository.findOneBy({episode_id: filmAPI.episode_id})
-          if(!episode_id){
-            let film = new Films()
-            film.title = filmAPI.title
-            console.log(`CREANDO PELICULA NUEVA...${filmAPI.title}`)
-            film.episode_id = filmAPI.episode_id
-            await AppDataSource.manager.save(film)
-            for(let j = 0; j < filmAPI.characters.length; j++){
-              let characterAPI = await AXIOS.get(filmAPI.characters[j]);
-              let peopleRepository = await AppDataSource.getRepository(People)
-              let characterDB = await peopleRepository.findOneBy({name: characterAPI.data.name})
-              let characterID = filmAPI.characters[j].split('/')
-              let idAPI:number = Number(characterID[characterID.length - 2])
-              let peopleInFilms = new PeopleInFilms()
-              peopleInFilms.film_id = film.episode_id
-              if(characterDB){
-                peopleInFilms.people_id = characterDB.idAPI
-                //Si existe entonces solo agregar la pelicula a su repertorio
-                console.log("EL PERSONAJE YA EXISTE")
-                // characterDB.films.push(film)
-              }else{
-                console.log("CREANDO NUEVA PERSONA...")
-                let people = new People()
-                people.idAPI = idAPI;
-                people.name = characterAPI.data.name
-                people.gender = characterAPI.data.gender
-                try{
-                  console.log("Buscando especie...")
-                  let specie = await AXIOS.get(characterAPI.data.species[0])
-                  people.species = await specie.data.name
-                  console.log(`Especie agregada: ${specie.data.name}`)
-                }catch(err){
-                  console.error("La especie no se encuentra!")
-                  people.species = "human"
-                  console.log("Especie indefinida Agregada!")
-                }
-                //Guardamos la relacion ManyToMany
-                peopleInFilms.people_id = people.idAPI
-                console.log("Guardando Personaje...")
-                AppDataSource.manager.save(people)
-                console.log("Personaje Guardado!")
-              }
-              await AppDataSource.manager.save(peopleInFilms)
-            };
-            await AppDataSource.manager.save(film)
-            console.log(`PELICULA ${film.title} GUARDADA!`)
+          for(let i = 0; i < filmsAPI.data.results.length; i++){
+            let filmAPI = filmsAPI.data.results[i]
+            let episode_id = await filmRepository.findOneBy({episode_id: filmAPI.episode_id})
+            if(!episode_id){
+              let film = new Films()
+              let filmUrlSplited = (filmAPI.url).split("/")
+              film.id = filmUrlSplited[filmUrlSplited.length - 2]
+              film.title = filmAPI.title
+              film.episode_id = filmAPI.episode_id
+              await AppDataSource.manager.save(film)
+              console.log(`Película ${film.title} guardada!`)
+            }
           }
+        }catch(err){
+          console.error(err)
+          // sendError(res,502,'Bad Gateway');
         }
-        console.log("BASE DE DATOS COMPLETA chekedCompleteDB")
-        chekedCompleteDB = true; //Se completo la DB
-      } catch (error) {
+      }
+    }
+
+    async function refillPeopleForThisFilm(res:Response, id:number) {
+      if(!chekingPeopleForThisFilms){
+        try{
+          let filmAPI = await AXIOS.get(`https://swapi.dev/api/films/${id}/`);
+          let characters = filmAPI.data.characters
+          for(let i = 0; i < characters.length; i++){
+            let characterAPI = await AXIOS.get(characters[i]);
+            let peopleRepository = await AppDataSource.getRepository(People)
+            let characterInDB = await peopleRepository.findOneBy({name: characterAPI.data.name})
+            let characterUrlSplited = characters[i].split('/')
+            let characterIdFromApi:number = Number(characterUrlSplited[characterUrlSplited.length - 2])
+            let peopleInFilms = new PeopleInFilms()
+            peopleInFilms.film_id = filmAPI.data.episode_id
+            if(characterInDB){
+              peopleInFilms.people_id = characterInDB.id
+            }else{
+              let people = new People()
+              people.id = characterIdFromApi
+              people.name = characterAPI.data.name
+              people.gender = characterAPI.data.gender
+              let species = await getSpecieFromThisUrl(res, characterAPI.data.species[0])
+              people.species = species
+              AppDataSource.manager.save(people)
+              console.log(`Personaje ${people.name} guardado!`)
+              peopleInFilms.people_id = people.id
+            }
+            await AppDataSource.manager.save(peopleInFilms)
+          }
+        }catch(err){
+          console.error(err)
+          // sendError(res,502,'Bad Gateway');
+        }
+      }
+    }
+
+    async function getSpecieFromThisUrl(res:Response, url:string) {
+      try{
+        let specie = await AXIOS.get(url)
+        return specie.data.name
+      }catch(err){
+        console.error(err)
         sendError(res,502,'Bad Gateway');
       }
     }
 
-    async function checkDB(res:Response) {
-      console.log(`BANDERA DE DB (checkedDB)--> ${chekedDB}`)
-      const filmsRepository = AppDataSource.getRepository(Films)
-      const savedFilms = await filmsRepository.find()
-      let filmsAPI = await AXIOS.get("https://swapi.dev/api/films");
-      if(chekedDB === false && savedFilms.length < filmsAPI.data.count){
-        console.log("La base de datos se completará")
-        chekedDB = true
-        console.log(`BANDERA DE DB (checkedDB)--> ${chekedDB}`)
-        await refillDB(res);
-      }else if(savedFilms.length === filmsAPI.data.count){
-        chekedCompleteDB = true; //Se completo la DB
-      }
-    }
+    // async function checkDB(res:Response) {
+    //   console.log(`BANDERA DE DB (checkedDB)--> ${chekedDB}`)
+    //   const filmsRepository = AppDataSource.getRepository(Films)
+    //   const savedFilms = await filmsRepository.find()
+    //   let filmsAPI = await AXIOS.get("https://swapi.dev/api/films");
+    //   if(chekedDB === false && savedFilms.length < filmsAPI.data.count){
+    //     console.log("La base de datos se completará")
+    //     chekedDB = true
+    //     console.log(`BANDERA DE DB (checkedDB)--> ${chekedDB}`)
+    //     await refillDB(res);
+    //   }else if(savedFilms.length === filmsAPI.data.count){
+    //     chekedCompleteDB = true; //Se completo la DB
+    //   }
+    // }
 
     app.use(async (req:Request, res:Response) => {
       console.log(`Metodo: ${req.method}`);
@@ -124,46 +133,45 @@ AppDataSource.initialize()
       let peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
       switch (req.method) {
         case "GET":
-          checkDB(res);
+          refillFilmsInDB(res)
           console.log("req.path: ", req.path);
           console.log("req.params: ", req.params)
-          let param:string = req.path.split("/")[2];
-          
+          let pathSplited = req.path.split("/")
+          let param = pathSplited[pathSplited.length - 1]
           if (req.path.startsWith("/films")) {
-
-            if (!param) {
-              let param = await filmsRepository.find()
-              console.log("chekedCompleteDB --> ",chekedCompleteDB)
-              res.render("infoTemplate", {results: param, searchFilm: true, chekedCompleteDB: chekedCompleteDB});
+            console.log(param)
+            if (param == "all") {
+              let films = await filmsRepository.find()
+              res.render("infoTemplate", {results: films, searchFilm: true});
             } else {
               console.log("Parametro buscado:", req.query.searchFilm)
-              let someFilmParam:string = String(req.query.searchFilm);
+              let someFilms:string = String(req.query.searchFilm);
+
               //https://www.tutorialspoint.com/typeorm/typeorm_query_builder.htm
               //https://typeorm.io/#using-querybuilder
+
               let films = await filmsRepository
                 .createQueryBuilder("film")
-                .where("LOWER(film.title) LIKE LOWER(:title)", { title: `%${someFilmParam}%` })
+                .where("LOWER(film.title) LIKE LOWER(:title)", { title: `%${someFilms}%` })
                 .getMany();
-              console.log("chekedCompleteDB --> ",chekedCompleteDB)
-              res.render("infoTemplate",{results: films, chekedCompleteDB: chekedCompleteDB})
+              res.render("infoTemplate",{results: films})
             }
-
           } else if (req.path.startsWith("/film/")){
-
+            let param:string = req.path.split("/")[2];
             let oneFilmParam:number = parseInt(param)
             let film = await filmsRepository.findOneBy({episode_id: oneFilmParam})
-            let peopleIds = await findAllIdsPeopleForThisFilm(film!.episode_id)
+            let peopleIds = await getPeopleIdWhitEpisodeId(film!.episode_id)
             let characters = await peopleRepository 
               .createQueryBuilder("film")
               .where("idAPI IN (:...ids)", { ids: peopleIds })
               .getMany();
-            res.render("infoTemplate",{film: film, characters: characters,chekedCompleteDB: chekedCompleteDB})
+            res.render("infoTemplate",{film: film, characters: characters})
           
           } else {
             switch (req.path) {
               case "/":
                 console.log("Chequeando DB")
-                res.render("homeTemplate", {chekedCompleteDB: chekedCompleteDB});
+                res.render("homeTemplate");
                 break;
               default:
                 sendError(res,404,'Not found');
@@ -178,23 +186,21 @@ AppDataSource.initialize()
               let param:number = parseInt(req.path.split("/")[3]);
               let film = await filmsRepository.findOneBy({episode_id: param})
               if(film){
-                let charactersIdsToDelete = await findAllIdsPeopleForThisFilm(film.episode_id);
+                let charactersIdsToDelete = await getPeopleIdWhitEpisodeId(film.episode_id);
                 await peopleRepository.createQueryBuilder()
                   .delete()
                   .from(People)
                   .where("idAPI IN (:...charactersIdsToDelete)", { charactersIdsToDelete })
                   .execute();
-                chekedCompleteDB = false;
-                chekedDB = false;
               }else{
                 throw new Error('Bad Request');
               }
             }catch(err){
               console.log(err)
-              sendError(res,400,'Bad Request');
+              // sendError(res,400,'Bad Request');
             }
 
-            res.render("infoTemplate", {chekedCompleteDB: chekedCompleteDB});
+            res.render("infoTemplate");
 
           }else{
             switch (req.path) {
@@ -211,20 +217,16 @@ AppDataSource.initialize()
                   .createQueryBuilder()
                   .delete()
                   .execute();
-  
-                chekedCompleteDB = false;
-                chekedDB = false;
                 res.render("infoTemplate");
                 break;
               default:
-                // sendError(res,404,'Not found');
+                sendError(res,404,'Not found');
                 break;
             }
             break;
           }
-
         default:
-          // await sendError(res,501,'Not Implemented');
+          sendError(res,501,'Not Implemented');
           break;
       }
     });
