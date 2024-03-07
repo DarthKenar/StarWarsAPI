@@ -224,10 +224,11 @@ AppDataSource.initialize()
                   .from(People)
                   .where("id IN (:...charactersIdsToDelete)", { charactersIdsToDelete })
                   .execute();
+                let filmId = [film.id]
                 await peopleInFilmsRepository.createQueryBuilder()
                   .delete()
                   .from(PeopleInFilms)
-                  .where("people_id IN (:...charactersIdsToDelete)", { charactersIdsToDelete })
+                  .where("film_id IN (:...charactersIdsToDelete)", { filmId })
                   .execute();
                 await updateCharactersStatus(film.id,false)
                 console.log("-----------------------------------------------------------")
