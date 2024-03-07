@@ -1,6 +1,6 @@
 {{>searchFilm}}
 <main id="main">
-    {{>checkedDB}}
+    {{!-- {{>checkedDB}} --}}
     {{#if results}}
         {{#if chekedCompleteDB}}
             <button hx-delete="/delete/all" hx-target="#main" hx-swap="outerHTML">Borrar Todo</button>
@@ -8,7 +8,7 @@
         {{#each results}}
             <h1>Título: {{this.title}}</h1>
             <h2>Episodio: {{this.episode_id}}</h2>
-            <a href="/film/{{this.episode_id}}">+ Info</a>
+            <a href="/film/{{this.id}}">+ Info</a>
         {{/each}}
     {{else}}
         <a href="/films/all">Volver</a>

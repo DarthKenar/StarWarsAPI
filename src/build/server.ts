@@ -18,13 +18,14 @@ app.set('views', PATH.join(__dirname, '../views'));
 AppDataSource.initialize()
   .then(() => {
 
-    async function getPeopleIdWhitEpisodeId(episode_id:number){
+    async function getPeopleIdWhitFilmId(id:number){
       try{
         let peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
-        let peopleInFilms = await peopleInFilmsRepository.findBy({film_id: episode_id})
+        let peopleInFilms = await peopleInFilmsRepository.findBy({film_id: id})
         let peopleIds = peopleInFilms.map(obj => obj.people_id);
         return peopleIds
       }catch(err){
+        return []
         console.log(err)
       }
     }
@@ -61,52 +62,65 @@ AppDataSource.initialize()
         }catch(err){
           console.error(err)
           // sendError(res,502,'Bad Gateway');
+        }finally{
+          chekingFilms = false
         }
       }
     }
 
     async function refillPeopleForThisFilm(res:Response, id:number) {
-      if(!chekingPeopleForThisFilms){
-        try{
-          let filmAPI = await AXIOS.get(`https://swapi.dev/api/films/${id}/`);
-          let characters = filmAPI.data.characters
-          for(let i = 0; i < characters.length; i++){
-            let characterAPI = await AXIOS.get(characters[i]);
-            let peopleRepository = await AppDataSource.getRepository(People)
-            let characterInDB = await peopleRepository.findOneBy({name: characterAPI.data.name})
-            let characterUrlSplited = characters[i].split('/')
-            let characterIdFromApi:number = Number(characterUrlSplited[characterUrlSplited.length - 2])
-            let peopleInFilms = new PeopleInFilms()
-            peopleInFilms.film_id = filmAPI.data.episode_id
-            if(characterInDB){
-              peopleInFilms.people_id = characterInDB.id
-            }else{
-              let people = new People()
-              people.id = characterIdFromApi
-              people.name = characterAPI.data.name
-              people.gender = characterAPI.data.gender
-              let species = await getSpecieFromThisUrl(res, characterAPI.data.species[0])
-              people.species = species
-              AppDataSource.manager.save(people)
-              console.log(`Personaje ${people.name} guardado!`)
-              peopleInFilms.people_id = people.id
+      let characters = await getPeopleIdWhitFilmId(id)
+      console.log(characters)
+      if(characters.length === 0){
+        if(!chekingPeopleForThisFilms.includes(id)){
+          chekingPeopleForThisFilms.push(id)
+          try{
+            let filmAPI = await AXIOS.get(`https://swapi.dev/api/films/${id}/`);
+            let characters = filmAPI.data.characters
+            for(let i = 0; i < characters.length; i++){
+              let characterAPI = await AXIOS.get(characters[i]);
+              let peopleRepository = await AppDataSource.getRepository(People)
+              let characterInDB = await peopleRepository.findOneBy({name: characterAPI.data.name})
+              let characterUrlSplited = characters[i].split('/')
+              let characterIdFromApi:number = Number(characterUrlSplited[characterUrlSplited.length - 2])
+              let peopleInFilms = new PeopleInFilms()
+              peopleInFilms.film_id = id
+              if(characterInDB){
+                peopleInFilms.people_id = characterInDB.id
+              }else{
+                let people = new People()
+                people.id = characterIdFromApi
+                people.name = characterAPI.data.name
+                people.gender = characterAPI.data.gender
+                let species = await getSpecieFromThisUrl(res, characterAPI.data.species[0])
+                people.species = species
+                AppDataSource.manager.save(people)
+                console.log(`Personaje ${people.name} guardado!`)
+                peopleInFilms.people_id = people.id
+              }
+              await AppDataSource.manager.save(peopleInFilms)
             }
-            await AppDataSource.manager.save(peopleInFilms)
+          }catch(err){
+            console.error(err)
+            // sendError(res,502,'Bad Gateway');
+          }finally{
+            chekingPeopleForThisFilms = chekingPeopleForThisFilms.filter(item => item !== id);
           }
-        }catch(err){
-          console.error(err)
-          // sendError(res,502,'Bad Gateway');
         }
       }
     }
 
     async function getSpecieFromThisUrl(res:Response, url:string) {
-      try{
-        let specie = await AXIOS.get(url)
-        return specie.data.name
-      }catch(err){
-        console.error(err)
-        sendError(res,502,'Bad Gateway');
+      if(url){
+        try{
+          let species = await AXIOS.get(url)
+          return species.data.name
+        }catch(err){
+          console.error(err)
+          sendError(res,502,'Bad Gateway');
+        }
+      }else{
+        return "undefined"
       }
     }
 
@@ -131,46 +145,41 @@ AppDataSource.initialize()
       let filmsRepository = await AppDataSource.getRepository(Films)
       let peopleRepository = await AppDataSource.getRepository(People)
       let peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
+      let pathSplited = req.path.split("/")
+      let param = pathSplited[pathSplited.length - 1]
       switch (req.method) {
         case "GET":
           refillFilmsInDB(res)
-          console.log("req.path: ", req.path);
-          console.log("req.params: ", req.params)
-          let pathSplited = req.path.split("/")
-          let param = pathSplited[pathSplited.length - 1]
+          console.log("Ultimo parámetro del path:", param)
           if (req.path.startsWith("/films")) {
-            console.log(param)
             if (param == "all") {
               let films = await filmsRepository.find()
               res.render("infoTemplate", {results: films, searchFilm: true});
             } else {
               console.log("Parametro buscado:", req.query.searchFilm)
               let someFilms:string = String(req.query.searchFilm);
-
               //https://www.tutorialspoint.com/typeorm/typeorm_query_builder.htm
               //https://typeorm.io/#using-querybuilder
-
               let films = await filmsRepository
                 .createQueryBuilder("film")
                 .where("LOWER(film.title) LIKE LOWER(:title)", { title: `%${someFilms}%` })
                 .getMany();
               res.render("infoTemplate",{results: films})
             }
-          } else if (req.path.startsWith("/film/")){
-            let param:string = req.path.split("/")[2];
-            let oneFilmParam:number = parseInt(param)
-            let film = await filmsRepository.findOneBy({episode_id: oneFilmParam})
-            let peopleIds = await getPeopleIdWhitEpisodeId(film!.episode_id)
+          } else if (req.path.startsWith("/film")){
+
+            let filmId:number = parseInt(param)
+            await refillPeopleForThisFilm(res,filmId)
+            let film = await filmsRepository.findOneBy({id: filmId})
+            let peopleIds = await getPeopleIdWhitFilmId(film!.id)
             let characters = await peopleRepository 
               .createQueryBuilder("film")
-              .where("idAPI IN (:...ids)", { ids: peopleIds })
+              .where("id IN (:...ids)", { ids: peopleIds })
               .getMany();
             res.render("infoTemplate",{film: film, characters: characters})
-          
           } else {
             switch (req.path) {
               case "/":
-                console.log("Chequeando DB")
                 res.render("homeTemplate");
                 break;
               default:
@@ -182,21 +191,20 @@ AppDataSource.initialize()
         case "DELETE":
           if (req.path.startsWith("/delete/episode/")) {
             try{
-              console.log(req.path.split("/")[2])
-              let param:number = parseInt(req.path.split("/")[3]);
-              let film = await filmsRepository.findOneBy({episode_id: param})
+              let param:number = parseInt(req.path.split("/")[-1]);
+              let film = await filmsRepository.findOneBy({id: param})
               if(film){
-                let charactersIdsToDelete = await getPeopleIdWhitEpisodeId(film.episode_id);
+                let charactersIdsToDelete = await getPeopleIdWhitFilmId(film.id);
                 await peopleRepository.createQueryBuilder()
                   .delete()
                   .from(People)
-                  .where("idAPI IN (:...charactersIdsToDelete)", { charactersIdsToDelete })
+                  .where("id IN (:...charactersIdsToDelete)", { charactersIdsToDelete })
                   .execute();
               }else{
                 throw new Error('Bad Request');
               }
             }catch(err){
-              console.log(err)
+              console.error(err)
               // sendError(res,400,'Bad Request');
             }
 
