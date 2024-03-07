@@ -6,14 +6,15 @@
             <button hx-delete="/delete/all" hx-target="#main" hx-swap="outerHTML">Borrar Todo</button>
         {{/if}}
         {{#each results}}
-            <h1>Título: {{this.title}}</h1>
+            {{!-- Si la película tiene los personajes descargados... mostrar el tick --}}
+            <h1>Título: {{this.title}} ✅</h1>
             <h2>Episodio: {{this.episode_id}}</h2>
             <a href="/film/{{this.id}}">+ Info</a>
         {{/each}}
     {{else}}
         <a href="/films/all">Volver</a>
         {{#if film}}
-            <h1>Título: {{film.title}}</h1>
+            <h1>{{film.title}} ✅</h1>
             <h2>Episodio: <span id="episode_id" name="episode_id">{{film.episode_id}}</span></h2>
             {{#if chekedCompleteDB}}
                 <button hx-delete="/delete/episode/{{film.episode_id}}" hx-trigger="click" hx-target="#main" hx-swap="outerHTML" hx-params="episode_id={{film.episode_id}}">Eliminar Personajes</button>
