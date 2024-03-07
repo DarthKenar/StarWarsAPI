@@ -38,6 +38,7 @@ AppDataSource.initialize()
         errorInfo: errorInfo
       });
     };
+
     async function refillDB(res:Response){
       try {
         let filmsAPI = await AXIOS.get("https://swapi.dev/api/films");
@@ -78,7 +79,7 @@ AppDataSource.initialize()
                   console.log(`Especie agregada: ${specie.data.name}`)
                 }catch(err){
                   console.error("La especie no se encuentra!")
-                  people.species = "undefined"
+                  people.species = "human"
                   console.log("Especie indefinida Agregada!")
                 }
                 //Guardamos la relacion ManyToMany
@@ -99,6 +100,7 @@ AppDataSource.initialize()
         sendError(res,502,'Bad Gateway');
       }
     }
+
     async function checkDB(res:Response) {
       console.log(`BANDERA DE DB (checkedDB)--> ${chekedDB}`)
       const filmsRepository = AppDataSource.getRepository(Films)
@@ -170,58 +172,59 @@ AppDataSource.initialize()
           }
           break;
         case "DELETE":
-          switch (req.path) {
-            case "/delete/all":
-
-              await filmsRepository
-                .createQueryBuilder()
-                .delete()
-                .execute();
-              await peopleRepository
-                .createQueryBuilder()
-                .delete()
-                .execute();
-              await peopleInFilmsRepository
-                .createQueryBuilder()
-                .delete()
-                .execute();
-
-              chekedCompleteDB = false;
-              chekedDB = false;
-              res.render("infoTemplate",);
-              break;
-
-            case "/delete/episode_id":
-              try{
-                let id = Number(req.query.episode_id)
-                let film = await filmsRepository.findOneBy({episode_id: id})
-                if(film){
-                  let charactersIdsToDelete = await findAllIdsPeopleForThisFilm(film.episode_id);
-                  await peopleRepository
-                    .createQueryBuilder()
-                    .delete()
-                    .from(People)
-                    .where("idAPI IN (:...ids)", { ids: charactersIdsToDelete })
-                    .execute();
-                  await AppDataSource.manager.save(film)
-                  chekedCompleteDB = false;
-                  chekedDB = false;
-                  res.render("infoTemplate", {chekedCompleteDB: chekedCompleteDB});
-                }else{
-                  throw new Error('Bad Request');
-                }
-              }catch(err){
-                sendError(res,400,'Bad Request');
+          if (req.path.startsWith("/delete/episode/")) {
+            try{
+              console.log(req.path.split("/")[2])
+              let param:number = parseInt(req.path.split("/")[3]);
+              let film = await filmsRepository.findOneBy({episode_id: param})
+              if(film){
+                let charactersIdsToDelete = await findAllIdsPeopleForThisFilm(film.episode_id);
+                await peopleRepository.createQueryBuilder()
+                  .delete()
+                  .from(People)
+                  .where("idAPI IN (:...charactersIdsToDelete)", { charactersIdsToDelete })
+                  .execute();
+                chekedCompleteDB = false;
+                chekedDB = false;
+              }else{
+                throw new Error('Bad Request');
               }
+            }catch(err){
+              console.log(err)
+              sendError(res,400,'Bad Request');
+            }
 
-              break;
-            default:
-              sendError(res,404,'Not found');
-              break;
+            res.render("infoTemplate", {chekedCompleteDB: chekedCompleteDB});
+
+          }else{
+            switch (req.path) {
+              case "/delete/all":
+                await filmsRepository
+                  .createQueryBuilder()
+                  .delete()
+                  .execute();
+                await peopleRepository
+                  .createQueryBuilder()
+                  .delete()
+                  .execute();
+                await peopleInFilmsRepository
+                  .createQueryBuilder()
+                  .delete()
+                  .execute();
+  
+                chekedCompleteDB = false;
+                chekedDB = false;
+                res.render("infoTemplate");
+                break;
+              default:
+                // sendError(res,404,'Not found');
+                break;
+            }
+            break;
           }
-          break;
+
         default:
-          await sendError(res,501,'Not Implemented');
+          // await sendError(res,501,'Not Implemented');
           break;
       }
     });
