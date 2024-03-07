@@ -84,13 +84,9 @@ AppDataSource.initialize()
 
     async function refillPeopleForThisFilm(res:Response, id:number) {
       let characters = await getPeopleIdWhitFilmId(id)
-      console.log(characters)
       if(characters.length === 0){
-        console.log(!chekingPeopleForThisFilms.includes(id))
         if(!chekingPeopleForThisFilms.includes(id)){
-          console.log("************************************")
           chekingPeopleForThisFilms.push(id)
-          console.log(chekingPeopleForThisFilms)
           try{
             let filmAPI = await AXIOS.get(`https://swapi.dev/api/films/${id}/`);
             let characters = filmAPI.data.characters
@@ -120,7 +116,7 @@ AppDataSource.initialize()
             }
           }catch(err){
             await updateCharactersStatus(id,false)
-            console.error(err)
+            // console.error(err)
             saveError(502,'La API externa no funciona (Bad Gateway)');
           }finally{
             chekingPeopleForThisFilms = chekingPeopleForThisFilms.filter(item => item !== id);
@@ -183,9 +179,7 @@ AppDataSource.initialize()
           } else if (req.path.startsWith("/film")){
 
             let filmId:number = parseInt(param)
-            console.log("--------------------------------")
             await refillPeopleForThisFilm(res,filmId)
-            console.log("--------------------------------")
             let film = await filmsRepository.findOneBy({id: filmId})
             if (film === null) {
               saveError(404,"No se encontró la película, (Not found Error).")
@@ -202,7 +196,6 @@ AppDataSource.initialize()
           } else {
             switch (req.path) {
               case "/":
-                console.log("RENDERIZA EL HOME")
                 res.render("homeTemplate",);
                 break;
               default:
@@ -213,9 +206,7 @@ AppDataSource.initialize()
         case "DELETE":
           if (req.path.startsWith("/delete/episode/")) {
             try{
-              console.log("-----------------------------------------------------------")
               let paramNumber = parseInt(param);
-              console.log(param)
               let film = await filmsRepository.findOneBy({id: paramNumber})
               if(film){
                 let charactersIdsToDelete = await getPeopleIdWhitFilmId(film.id);
@@ -231,12 +222,9 @@ AppDataSource.initialize()
                   .where("film_id IN (:...charactersIdsToDelete)", { filmId })
                   .execute();
                 await updateCharactersStatus(film.id,false)
-                console.log("-----------------------------------------------------------")
                 await AppDataSource.manager.save(peopleRepository)
               }
-              console.log("-----------------------------------------------------------")
               let films = await filmsRepository.find()
-              console.log("-----------------------------------------------------------")
               res.render("infoTemplate", {results: films});
             }catch(err){
               // console.error(err)
