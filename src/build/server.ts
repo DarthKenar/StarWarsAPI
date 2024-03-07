@@ -85,6 +85,7 @@ AppDataSource.initialize()
     async function refillPeopleForThisFilm(res:Response, id:number) {
       let characters = await getPeopleIdWhitFilmId(id)
       console.log("-------------------------------------")
+      console.log(characters.length)
       if(characters.length === 0){
         console.log("-------------------------------------")
         if(!chekingPeopleForThisFilms.includes(id)){
@@ -124,6 +125,7 @@ AppDataSource.initialize()
             await updateCharactersStatus(id,false)
             // console.error(err)
           }finally{
+            console.log("sacando el check de", chekingPeopleForThisFilms)
             chekingPeopleForThisFilms = chekingPeopleForThisFilms.filter(item => item !== id);
           }
         }
@@ -161,8 +163,10 @@ AppDataSource.initialize()
               await refillFilmsInDB(res)
               let films = await filmsRepository.find()
               if(films){
+                console.log("Render 166")
                 res.render("infoTemplate", {results: films, searchFilm: true});
               }else{
+                console.log("Render 169")
                 res.render("infoTemplate", {error: error})
               }
             } else {
@@ -175,36 +179,50 @@ AppDataSource.initialize()
                 .where("LOWER(film.title) LIKE LOWER(:title)", { title: `%${someFilms}%` })
                 .getMany();
               if(films.length > 0){
+                console.log("Render 182")
                 res.render("infoTemplate",{results: films})
               }else{
                 saveError(404,"No se encontraron Películas, (Not found Error).")
+                console.log("Render 186")
                 res.render("infoTemplate",{error: error})
               }
             }
           } else if (req.path.startsWith("/film")){
-
-            let filmId:number = parseInt(param)
-            await refillPeopleForThisFilm(res,filmId)
-            let film = await filmsRepository.findOneBy({id: filmId})
-            if (film === null) {
-              saveError(404,"No se encontró la película, (Not found Error).")
+            console.log("SI EMPIEZA CON FILM")
+            try{
+              let filmId:number = parseInt(param)
+              await refillPeopleForThisFilm(res,filmId)
+              let film = await filmsRepository.findOneBy({id: filmId})
+              if (film === null) {
+                saveError(404,"No se encontró la película, (Not found Error).")
+                console.log("Render 197")
+                res.render("infoTemplate",{error: error})
+              }else{
+                let peopleIds = await getPeopleIdWhitFilmId(film!.id)
+                let characters = await peopleRepository 
+                  .createQueryBuilder("film")
+                  .where("id IN (:...ids)", { ids: peopleIds })
+                  .getMany();
+                  
+                if(characters.length > 0){
+                  console.log("Render 205")
+                  res.render("infoTemplate",{film: film, characters: characters})
+                }else{
+                  console.log("Render 211")
+                  res.render("infoTemplate",{film: film, error: error})
+                }
+              }
+            }catch{
+              console.log("Render 209")
               res.render("infoTemplate",{error: error})
-            }else{
-              let peopleIds = await getPeopleIdWhitFilmId(film!.id)
-              let characters = await peopleRepository 
-                .createQueryBuilder("film")
-                .where("id IN (:...ids)", { ids: peopleIds })
-                .getMany();
-              res.render("infoTemplate",{film: film, characters: characters})
             }
-
           } else {
             switch (req.path) {
               case "/":
-                res.render("homeTemplate",);
+                console.log("Render 217")
+                res.render("homeTemplate");
                 break;
               default:
-                res.render("infoTemplate",{error: error})
                 break;
             }
           }
@@ -230,10 +248,12 @@ AppDataSource.initialize()
                 await AppDataSource.manager.save(peopleRepository)
               }
               let films = await filmsRepository.find()
+              console.log("Render 248")
               res.render("infoTemplate", {results: films});
             }catch(err){
               // console.error(err)
               saveError(400,'La solicitud de eliminacion no se pudo ejecutar, (Bad Request)');
+              console.log("Render 253")
               res.render("infoTemplate", {error: error});
             }
           }else{
