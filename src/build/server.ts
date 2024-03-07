@@ -11,6 +11,11 @@ const PATH = require("path")
 const PORT = process.env.PORT || 3000
 var chekingFilms:boolean = false; //Bandera para que no se repita el rellenado de las películas
 var chekingPeopleForThisFilms:number[] = []; //Bandera para que no se repita el rellenado de los personajes en una película
+var FilmListWhitAllCharacters:number[] = []
+var error = {
+  code: 0,
+  info: ""
+}
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.set('views', PATH.join(__dirname, '../views'));
@@ -25,18 +30,14 @@ AppDataSource.initialize()
         let peopleIds = peopleInFilms.map(obj => obj.people_id);
         return peopleIds
       }catch(err){
-        return []
         console.log(err)
+        return []
       }
     }
 
-    function sendError(res:Response, codeError:number, errorInfo:string){
-      console.error(res.statusCode);
-      res.statusCode = codeError;
-      res.render("errorTemplate",{
-        error: `${codeError}`,
-        errorInfo: errorInfo
-      });
+    function saveError(res:Response, codeError:number, errorInfo:string){
+      error.code = codeError
+      error.info = errorInfo;
     };
 
     async function refillFilmsInDB(res:Response){
@@ -60,8 +61,8 @@ AppDataSource.initialize()
             }
           }
         }catch(err){
+          saveError(res,502,"Bad Gateway")
           console.error(err)
-          // sendError(res,502,'Bad Gateway');
         }finally{
           chekingFilms = false
         }
@@ -102,9 +103,11 @@ AppDataSource.initialize()
             }
           }catch(err){
             console.error(err)
-            // sendError(res,502,'Bad Gateway');
+            saveError(res,502,'Bad Gateway');
           }finally{
             chekingPeopleForThisFilms = chekingPeopleForThisFilms.filter(item => item !== id);
+            FilmListWhitAllCharacters.push(id)
+            
           }
         }
       }
@@ -117,7 +120,7 @@ AppDataSource.initialize()
           return species.data.name
         }catch(err){
           console.error(err)
-          sendError(res,502,'Bad Gateway');
+          saveError(res,502,'Bad Gateway');
         }
       }else{
         return "undefined"
@@ -146,15 +149,15 @@ AppDataSource.initialize()
       let peopleRepository = await AppDataSource.getRepository(People)
       let peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
       let pathSplited = req.path.split("/")
-      let param = pathSplited[pathSplited.length - 1]
+      let param = pathSplited[pathSplited.length - 2]
       switch (req.method) {
         case "GET":
-          refillFilmsInDB(res)
           console.log("Ultimo parámetro del path:", param)
           if (req.path.startsWith("/films")) {
             if (param == "all") {
-              let films = await filmsRepository.find()
-              res.render("infoTemplate", {results: films, searchFilm: true});
+              await refillFilmsInDB(res)
+              let films = filmsRepository.find()
+              res.render("infoTemplate", {results: films, searchFilm: true, FilmListWhitAllCharacters: FilmListWhitAllCharacters, error: error});
             } else {
               console.log("Parametro buscado:", req.query.searchFilm)
               let someFilms:string = String(req.query.searchFilm);
@@ -164,7 +167,7 @@ AppDataSource.initialize()
                 .createQueryBuilder("film")
                 .where("LOWER(film.title) LIKE LOWER(:title)", { title: `%${someFilms}%` })
                 .getMany();
-              res.render("infoTemplate",{results: films})
+              res.render("infoTemplate",{results: films, FilmListWhitAllCharacters: FilmListWhitAllCharacters})
             }
           } else if (req.path.startsWith("/film")){
 
@@ -176,14 +179,12 @@ AppDataSource.initialize()
               .createQueryBuilder("film")
               .where("id IN (:...ids)", { ids: peopleIds })
               .getMany();
-            res.render("infoTemplate",{film: film, characters: characters})
+            res.render("infoTemplate",{film: film, characters: characters, FilmListWhitAllCharacters: FilmListWhitAllCharacters})
           } else {
             switch (req.path) {
               case "/":
+                console.log("RENDERIZA EL HOME")
                 res.render("homeTemplate");
-                break;
-              default:
-                sendError(res,404,'Not found');
                 break;
             }
           }
@@ -200,14 +201,15 @@ AppDataSource.initialize()
                   .from(People)
                   .where("id IN (:...charactersIdsToDelete)", { charactersIdsToDelete })
                   .execute();
+                FilmListWhitAllCharacters = FilmListWhitAllCharacters.filter(item => item !== param);
               }else{
                 throw new Error('Bad Request');
               }
             }catch(err){
               console.error(err)
-              // sendError(res,400,'Bad Request');
+              saveError(res,400,'Bad Request');
             }
-
+            
             res.render("infoTemplate");
 
           }else{
@@ -225,16 +227,16 @@ AppDataSource.initialize()
                   .createQueryBuilder()
                   .delete()
                   .execute();
-                res.render("infoTemplate");
+                res.render("infoTemplate", {FilmListWhitAllCharacters: FilmListWhitAllCharacters, error: error});
                 break;
               default:
-                sendError(res,404,'Not found');
+                saveError(res,404,'Not found');
                 break;
             }
             break;
           }
         default:
-          sendError(res,501,'Not Implemented');
+          saveError(res,501,'Not Implemented');
           break;
       }
     });
