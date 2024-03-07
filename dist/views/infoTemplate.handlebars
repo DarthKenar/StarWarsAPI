@@ -1,9 +1,10 @@
 {{>searchFilm}}
 <main id="main">
+    {{FilmListWhitAllCharacters}}
     {{!-- {{>checkFilms}} --}}
     {{#if results}}
         {{#if chekedCompleteDB}}
-            <button hx-delete="/delete/all" hx-target="#main" hx-swap="outerHTML">Borrar Todo</button>
+            <button hx-delete="/delete/all/" hx-target="#main" hx-swap="outerHTML">Borrar Todo</button>
         {{/if}}
         {{#each results}}
             {{!-- Si la película tiene los personajes descargados... mostrar el tick --}}
@@ -14,12 +15,12 @@
     {{else}}
         <a href="/">Home</a>
         {{#if film}}
-            <a href="/films/all">Volver</a>
+            <a href="/films/all/">Volver</a>
             <h1>{{film.title}}</h1>
             <h2>Episodio: <span id="episode_id" name="episode_id">{{film.episode_id}}</span></h2>
-            {{#if (FilmInList FilmListWhitAllCharacters film.id)}}
+            {{!-- {{#if (FilmInList FilmListWhitAllCharacters film.id)}}
                 <button hx-delete="/delete/episode/{{film.episode_id}}" hx-trigger="click" hx-target="#main" hx-swap="outerHTML" hx-params="episode_id={{film.episode_id}}">Eliminar Personajes</button>
-            {{/if}}
+            {{/if}} --}}
             {{#each characters}}
                 <h3>Nombre: {{this.name}}</h3>
                 <h4>Género: {{this.gender}}</h4>
@@ -33,7 +34,7 @@
         <h1>Codigo de error: {{error.code}}</h1>
         <p>{{error.info}}</p>
         <button 
-        hx-get="/"
+        hx-get="/films/all/"
         hx-target="#main"
         hx-swap="outerHTML"
         >Volver</button>

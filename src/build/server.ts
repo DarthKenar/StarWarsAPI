@@ -6,18 +6,21 @@ import { AppDataSource } from "../database/data-source";
 import { Films, People, PeopleInFilms} from "../database/entity/Models";
 
 const app = express()
+var hbs = require('../views/layouts/helpers.js');
 const AXIOS = require("axios")
 const PATH = require("path")
 const PORT = process.env.PORT || 3000
 var chekingFilms:boolean = false; //Bandera para que no se repita el rellenado de las películas
 var chekingPeopleForThisFilms:number[] = []; //Bandera para que no se repita el rellenado de los personajes en una película
-var FilmListWhitAllCharacters:number[] = []
+var FilmListWhitAllCharacters:number[] = [1,2,3,4,5,6] //Bandera, verifica que películas no tienen los personajes agregados
 var error = {
   code: 0,
   info: ""
 }
-app.engine('handlebars', engine());
+
+app.engine('handlebars', engine({defaultLayout: 'main', handlebars: hbs}));
 app.set('view engine', 'handlebars');
+
 app.set('views', PATH.join(__dirname, '../views'));
 
 AppDataSource.initialize()
@@ -35,7 +38,7 @@ AppDataSource.initialize()
       }
     }
 
-    function saveError(res:Response, codeError:number, errorInfo:string){
+    function saveError(codeError:number, errorInfo:string){
       error.code = codeError
       error.info = errorInfo;
     };
@@ -61,8 +64,8 @@ AppDataSource.initialize()
             }
           }
         }catch(err){
-          saveError(res,502,"Bad Gateway")
-          console.error(err)
+          saveError(502,"La API externa no funciona. (Bad Gateway)")
+          // console.error(err)
         }finally{
           chekingFilms = false
         }
@@ -102,8 +105,8 @@ AppDataSource.initialize()
               await AppDataSource.manager.save(peopleInFilms)
             }
           }catch(err){
-            console.error(err)
-            saveError(res,502,'Bad Gateway');
+            // console.error(err)
+            saveError(502,'La API externa no funciona (Bad Gateway)');
           }finally{
             chekingPeopleForThisFilms = chekingPeopleForThisFilms.filter(item => item !== id);
             FilmListWhitAllCharacters.push(id)
@@ -119,8 +122,8 @@ AppDataSource.initialize()
           let species = await AXIOS.get(url)
           return species.data.name
         }catch(err){
-          console.error(err)
-          saveError(res,502,'Bad Gateway');
+          // console.error(err)
+          saveError(502,'La API externa no funciona, (Bad Gateway).');
         }
       }else{
         return "undefined"
@@ -167,28 +170,42 @@ AppDataSource.initialize()
                 .createQueryBuilder("film")
                 .where("LOWER(film.title) LIKE LOWER(:title)", { title: `%${someFilms}%` })
                 .getMany();
-              res.render("infoTemplate",{results: films, FilmListWhitAllCharacters: FilmListWhitAllCharacters})
+              if(films.length > 0){
+                console.log("HAY PELÏCULAS")
+                res.render("infoTemplate",{results: films, FilmListWhitAllCharacters: FilmListWhitAllCharacters})
+              }else{
+                saveError(404,"No se encontraron Películas, (Not found Error).")
+                res.render("infoTemplate",{error: error})
+              }
             }
           } else if (req.path.startsWith("/film")){
 
             let filmId:number = parseInt(param)
             await refillPeopleForThisFilm(res,filmId)
             let film = await filmsRepository.findOneBy({id: filmId})
-            let peopleIds = await getPeopleIdWhitFilmId(film!.id)
-            let characters = await peopleRepository 
-              .createQueryBuilder("film")
-              .where("id IN (:...ids)", { ids: peopleIds })
-              .getMany();
-            res.render("infoTemplate",{film: film, characters: characters, FilmListWhitAllCharacters: FilmListWhitAllCharacters})
+            if (film === null) {
+              saveError(404,"No se encontró la película, (Not found Error).")
+              res.render("infoTemplate",{error: error})
+            }else{
+              let peopleIds = await getPeopleIdWhitFilmId(film!.id)
+              let characters = await peopleRepository 
+                .createQueryBuilder("film")
+                .where("id IN (:...ids)", { ids: peopleIds })
+                .getMany();
+              res.render("infoTemplate",{film: film, characters: characters, FilmListWhitAllCharacters: FilmListWhitAllCharacters})
+            }
+
           } else {
             switch (req.path) {
               case "/":
                 console.log("RENDERIZA EL HOME")
-                res.render("homeTemplate");
+                res.render("homeTemplate",);
+                break;
+              default:
+                res.render("infoTemplate",{error: error})
                 break;
             }
           }
-          break;
         case "DELETE":
           if (req.path.startsWith("/delete/episode/")) {
             try{
@@ -206,8 +223,8 @@ AppDataSource.initialize()
                 throw new Error('Bad Request');
               }
             }catch(err){
-              console.error(err)
-              saveError(res,400,'Bad Request');
+              // console.error(err)
+              saveError(400,'La solicitud de eliminacion no se pudo ejecutar, (Bad Request)');
             }
             
             res.render("infoTemplate");
@@ -230,13 +247,12 @@ AppDataSource.initialize()
                 res.render("infoTemplate", {FilmListWhitAllCharacters: FilmListWhitAllCharacters, error: error});
                 break;
               default:
-                saveError(res,404,'Not found');
                 break;
             }
             break;
           }
         default:
-          saveError(res,501,'Not Implemented');
+          saveError(501,"Método no implementado, (Not Implemented)");
           break;
       }
     });
