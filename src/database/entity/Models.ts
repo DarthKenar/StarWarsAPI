@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, PrimaryColumn, Column, ManyToMany, JoinTable } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, PrimaryColumn, Column} from "typeorm"
 
 @Entity()
 export class Films {
@@ -11,6 +11,9 @@ export class Films {
 
     @Column()
     episode_id: number
+
+    @Column()
+    characters: boolean = false;
 
 }
 
