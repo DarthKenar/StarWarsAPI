@@ -84,11 +84,16 @@ AppDataSource.initialize()
 
     async function refillPeopleForThisFilm(res:Response, id:number) {
       let characters = await getPeopleIdWhitFilmId(id)
+      console.log("-------------------------------------")
       if(characters.length === 0){
+        console.log("-------------------------------------")
         if(!chekingPeopleForThisFilms.includes(id)){
+          console.log("-------------------------------------")
           chekingPeopleForThisFilms.push(id)
           try{
+            console.log("-------------------------------------")
             let filmAPI = await AXIOS.get(`https://swapi.dev/api/films/${id}/`);
+            console.log("-------------------------------------")
             let characters = filmAPI.data.characters
             for(let i = 0; i < characters.length; i++){
               let characterAPI = await AXIOS.get(characters[i]);
@@ -115,9 +120,9 @@ AppDataSource.initialize()
               await updateCharactersStatus(id,true)
             }
           }catch(err){
+            saveError(502,'La API externa no funciona (Bad Gateway)');
             await updateCharactersStatus(id,false)
             // console.error(err)
-            saveError(502,'La API externa no funciona (Bad Gateway)');
           }finally{
             chekingPeopleForThisFilms = chekingPeopleForThisFilms.filter(item => item !== id);
           }
