@@ -58,15 +58,17 @@ AppDataSource.initialize()
       if(!chekingFilms){
         chekingFilms = true;
         try{
-          let filmsAPI = await AXIOS.get("https://swapi.dev/api/films");
+          let filmsAPI = await AXIOS.get("https://swapi.info/api/films");
           let filmRepository = await AppDataSource.getRepository(Films)
-          for(let i = 0; i < filmsAPI.data.results.length; i++){
-            let filmAPI = filmsAPI.data.results[i]
+          for(let i = 0; i < filmsAPI.data.length; i++){
+            let filmAPI = filmsAPI.data[i]
+            console.log(filmAPI)
             let episode_id = await filmRepository.findOneBy({episode_id: filmAPI.episode_id})
             if(!episode_id){
               let film = new Films()
               let filmUrlSplited = (filmAPI.url).split("/")
-              let id = filmUrlSplited[filmUrlSplited.length - 2]
+              let id = filmUrlSplited[filmUrlSplited.length - 1]
+              console.log(filmUrlSplited[filmUrlSplited.length - 1])
               film.id = id
               film.title = filmAPI.title
               film.episode_id = filmAPI.episode_id
@@ -77,7 +79,7 @@ AppDataSource.initialize()
           }
         }catch(err){
           saveError(502,"La API externa no funciona. (Bad Gateway)")
-          // console.error(err)
+          console.error(err)
         }finally{
           chekingFilms = false
         }
@@ -95,7 +97,7 @@ AppDataSource.initialize()
           chekingPeopleForThisFilms.push(id)
           try{
             console.log("-------------------------------------")
-            let filmAPI = await AXIOS.get(`https://swapi.dev/api/films/${id}/`);
+            let filmAPI = await AXIOS.get(`https://swapi.info/api/films/${id}/`);
             console.log("-------------------------------------")
             let characters = filmAPI.data.characters
             for(let i = 0; i < characters.length; i++){
@@ -119,8 +121,11 @@ AppDataSource.initialize()
                 console.log(`Personaje ${people.name} guardado!`)
                 peopleInFilms.people_id = people.id
               }
+              console.log("1 GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
               await AppDataSource.manager.save(peopleInFilms)
+              console.log("2 GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
               await updateCharactersStatus(id,true)
+              console.log("3 GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
             }
           }catch(err){
             saveError(502,'La API externa no funciona (Bad Gateway)');
