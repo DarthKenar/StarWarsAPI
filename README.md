@@ -1,6 +1,6 @@
 # STAR WARS API para Kairox
 
-[Diagrama de modelos](./doc/models.mmd)
+[Diagrama de modelos](./src/doc/models.mmd)
 
 ## Objetivos
 
