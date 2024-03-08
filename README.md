@@ -1,6 +1,31 @@
 # STAR WARS API para Kairox
 
-![API STAR WARS](./doc/models.mmd){width='100px'}
+```
+erDiagram 
+    Films |o--|| PeopleInFilms : film_id
+    People |o--|| PeopleInFilms : people_id
+
+    Films {
+        id ForeingKey
+        title string
+        name CharField
+        episode_id number
+        characters boolean
+    }
+
+    PeopleInFilms {
+        id ForeingKey-Generated
+        film_id number
+        people_id number
+    }
+    
+    People {
+        id ForeingKey
+        name string
+        gender string
+        species string
+    }
+```
 
 ## Objetivos
 
