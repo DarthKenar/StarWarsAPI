@@ -1,5 +1,7 @@
 # STAR WARS API para Kairox
 
+![API STAR WARS](./doc/models.mmd){width='100px'}
+
 ## Objetivos
 
 Utilizando la [API STAR WARS](https://swapi.dev/documentation), podrás obtener las películas y personajes de cada entrega.
