@@ -5,3 +5,4 @@ IDEAS.md
 *.tmp
 .vscode/
 Desktop.ini
+database.sqlite
