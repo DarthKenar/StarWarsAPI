@@ -20,7 +20,6 @@ var error = {
 }
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
-
 app.set('views', PATH.join(__dirname, '../views'));
 
 AppDataSource.initialize()
@@ -136,7 +135,7 @@ AppDataSource.initialize()
           saveError(502,'La API externa no funciona, (Bad Gateway).');
         }
       }else{
-        return "undefined"
+        return "human"
       }
     }
 
