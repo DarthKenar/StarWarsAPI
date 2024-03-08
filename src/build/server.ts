@@ -197,6 +197,7 @@ AppDataSource.initialize()
                 res.render("infoTemplate",{results: films})
               }else{
                 console.log("Render 186")
+                saveError(404, "Not Found")
                 res.render("infoTemplate",{error: error})
               }
             }
@@ -237,7 +238,7 @@ AppDataSource.initialize()
                 res.render("homeTemplate");
                 break;
               default:
-                saveError(404,'La solicitud del cliente no está contemplada (Not Found)');
+                saveError(404,'No se encuentra una respuesta para la solicitud (Not Found)');
                 console.log("Render 223")
                 res.render("infoTemplate", {error: error});
                 break;
@@ -245,7 +246,7 @@ AppDataSource.initialize()
           }
           break;
         case "DELETE":
-          if (req.path.startsWith("/delete/episode/")) {
+          if (req.path.startsWith("/delete/film/")) {
             try{
               let paramNumber = parseInt(param);
               let filmsRepository = await AppDataSource.getRepository(Films)
@@ -286,21 +287,27 @@ AppDataSource.initialize()
             }
           }else{
             if (req.path == "/delete/all") {
-              let filmsRepository = await AppDataSource.getRepository(Films)
-              await filmsRepository
-              .createQueryBuilder()
-              .delete()
-              .execute();
-              let peopleRepository = await AppDataSource.getRepository(People)
-              await peopleRepository
+              try{
+                let filmsRepository = await AppDataSource.getRepository(Films)
+                await filmsRepository
                 .createQueryBuilder()
                 .delete()
                 .execute();
-              let peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
-              await peopleInFilmsRepository
-                .createQueryBuilder()
-                .delete()
-                .execute();
+                let peopleRepository = await AppDataSource.getRepository(People)
+                await peopleRepository
+                  .createQueryBuilder()
+                  .delete()
+                  .execute();
+                let peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
+                await peopleInFilmsRepository
+                  .createQueryBuilder()
+                  .delete()
+                  .execute();
+                res.render("homeTemplate");
+              }catch{
+                saveError(400,'Hubo un problema con la base de datos, (Bad Request)');
+                res.render("infoTemplate", {error: error});
+              }
             }else{
               saveError(400,'La solicitud de eliminacion no se pudo ejecutar, (Bad Request)');
               console.log("Render 290")
