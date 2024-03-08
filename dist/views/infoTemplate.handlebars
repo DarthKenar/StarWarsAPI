@@ -2,9 +2,7 @@
 <main id="main">
     {{#if results}}
         <a href="/">Home</a>
-        {{#if chekedCompleteDB}}
-            <button hx-delete="/delete/all/" hx-target="#main" hx-swap="outerHTML">Borrar Todo</button>
-        {{/if}}
+        <button hx-delete="/delete/all" hx-target="#body" hx-swap="outerHTML">Borrar Todo</button>
         {{#each results}}
             {{!-- Si la película tiene los personajes descargados... mostrar el tick --}}
             <h1>Título: {{this.title}} {{>checkCharacters}}</h1>
@@ -17,7 +15,7 @@
             <h1>{{film.title}}</h1>
             <h2>Episodio: <span id="episode_id" name="episode_id">{{film.episode_id}}</span></h2>
             {{#if film.characters }}
-                <button hx-delete="/delete/episode/{{film.id}}/" hx-trigger="click" hx-target="#main" hx-swap="outerHTML">Eliminar Personajes</button>
+                <button hx-delete="/delete/film/{{film.id}}/" hx-trigger="click" hx-target="#main" hx-swap="outerHTML">Eliminar Personajes</button>
             {{/if}}
             {{#each characters}}
                 <h3>Nombre: {{this.name}}</h3>
