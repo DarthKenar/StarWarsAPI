@@ -1,0 +1,31 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+      "title": "StarWars API para Kairox",
+      "version": "1.0.0"
+    },
+    "paths": {
+      "/films/all": {
+        "get": {
+          "summary": "Lista de todas las películas",
+          "responses": {
+            "200": {
+              "description": "Respuesta exitosa"
+            }
+          },
+          "tags": ["Películas"]
+        }
+      },
+      "/films/": {
+        "get": {
+          "summary": "Lista de todas las películas",
+          "responses": {
+            "200": {
+              "description": "Respuesta exitosa"
+            }
+          },
+          "tags": ["Películas"]
+        }
+      }
+    }
+}

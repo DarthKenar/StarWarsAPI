@@ -5,6 +5,9 @@ import { engine } from 'express-handlebars';
 import { AppDataSource } from "../database/data-source";
 import { Films, People, PeopleInFilms} from "../database/entity/Models";
 
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('../docs/swagger.json');
+
 const app = express()
 const AXIOS = require("axios")
 const PATH = require("path")
@@ -15,7 +18,6 @@ var error = {
   code: 0,
   info: ""
 }
-
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 
@@ -146,12 +148,11 @@ AppDataSource.initialize()
       }
     }
 
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
     app.use(async (req:Request, res:Response) => {
       console.log(`Metodo: ${req.method}`);
       console.log(`Path: ${req.path}`);
-      var filmsRepository = await AppDataSource.getRepository(Films)
-      var peopleRepository = await AppDataSource.getRepository(People)
-      var peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
       let pathSplited = req.path.split("/")
       pathSplited = pathSplited.filter(item => item !== "" && item !== "helpers.js");
       let param = pathSplited[pathSplited.length - 1]
@@ -161,8 +162,9 @@ AppDataSource.initialize()
           if (req.path.startsWith("/films")) {
             if (param == "all") {
               await refillFilmsInDB(res)
+              let filmsRepository = await AppDataSource.getRepository(Films)
               let films = await filmsRepository.find()
-              if(films){
+              if(films.length > 0){
                 console.log("Render 166")
                 res.render("infoTemplate", {results: films, searchFilm: true});
               }else{
@@ -174,6 +176,7 @@ AppDataSource.initialize()
               let someFilms:string = String(req.query.searchFilm);
               //https://www.tutorialspoint.com/typeorm/typeorm_query_builder.htm
               //https://typeorm.io/#using-querybuilder
+              let filmsRepository = await AppDataSource.getRepository(Films)
               let films = await filmsRepository
                 .createQueryBuilder("film")
                 .where("LOWER(film.title) LIKE LOWER(:title)", { title: `%${someFilms}%` })
@@ -182,16 +185,15 @@ AppDataSource.initialize()
                 console.log("Render 182")
                 res.render("infoTemplate",{results: films})
               }else{
-                saveError(404,"No se encontraron Películas, (Not found Error).")
                 console.log("Render 186")
                 res.render("infoTemplate",{error: error})
               }
             }
           } else if (req.path.startsWith("/film")){
-            console.log("SI EMPIEZA CON FILM")
             try{
               let filmId:number = parseInt(param)
               await refillPeopleForThisFilm(res,filmId)
+              let filmsRepository = await AppDataSource.getRepository(Films)
               let film = await filmsRepository.findOneBy({id: filmId})
               if (film === null) {
                 saveError(404,"No se encontró la película, (Not found Error).")
@@ -199,6 +201,7 @@ AppDataSource.initialize()
                 res.render("infoTemplate",{error: error})
               }else{
                 let peopleIds = await getPeopleIdWhitFilmId(film!.id)
+                let peopleRepository = await AppDataSource.getRepository(People)
                 let characters = await peopleRepository 
                   .createQueryBuilder("film")
                   .where("id IN (:...ids)", { ids: peopleIds })
@@ -223,22 +226,28 @@ AppDataSource.initialize()
                 res.render("homeTemplate");
                 break;
               default:
+                saveError(404,'La solicitud del cliente no está contemplada (Not Found)');
+                res.render("homeTemplate");
                 break;
             }
           }
+          break;
         case "DELETE":
           if (req.path.startsWith("/delete/episode/")) {
             try{
               let paramNumber = parseInt(param);
+              let filmsRepository = await AppDataSource.getRepository(Films)
               let film = await filmsRepository.findOneBy({id: paramNumber})
               if(film){
                 let charactersIdsToDelete = await getPeopleIdWhitFilmId(film.id);
+                let peopleRepository = await AppDataSource.getRepository(People)
                 await peopleRepository.createQueryBuilder()
                   .delete()
                   .from(People)
                   .where("id IN (:...charactersIdsToDelete)", { charactersIdsToDelete })
                   .execute();
                 let filmId = [film.id]
+                let peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
                 await peopleInFilmsRepository.createQueryBuilder()
                   .delete()
                   .from(PeopleInFilms)
@@ -257,32 +266,35 @@ AppDataSource.initialize()
               res.render("infoTemplate", {error: error});
             }
           }else{
-            switch (req.path) {
-              case "/delete/all":
-                await filmsRepository
-                  .createQueryBuilder()
-                  .delete()
-                  .execute();
-                await peopleRepository
-                  .createQueryBuilder()
-                  .delete()
-                  .execute();
-                await peopleInFilmsRepository
-                  .createQueryBuilder()
-                  .delete()
-                  .execute();
-                break;
-              default:
-                break;
+            if (req.path == "/delete/all") {
+              let filmsRepository = await AppDataSource.getRepository(Films)
+              await filmsRepository
+              .createQueryBuilder()
+              .delete()
+              .execute();
+              let peopleRepository = await AppDataSource.getRepository(People)
+              await peopleRepository
+                .createQueryBuilder()
+                .delete()
+                .execute();
+              let peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
+              await peopleInFilmsRepository
+                .createQueryBuilder()
+                .delete()
+                .execute();
+            }else{
+              saveError(400,'La solicitud de eliminacion no se pudo ejecutar, (Bad Request)');
+              res.render("infoTemplate", {error: error});
             }
-            break;
           }
+          break;
         default:
           saveError(501,"Método no implementado, (Not Implemented)");
+          res.render("infoTemplate", {error: error});
           break;
       }
     });
-    
+
     app.listen(PORT, () => {
       
       console.log(`Escuchando en puerto http://localhost:${PORT}...`);
