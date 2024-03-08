@@ -1,5 +1,0 @@
-GET http://localhost:3000
-
-{
-    "titulo": "La amenaza fantasma"
-}  

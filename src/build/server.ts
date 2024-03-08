@@ -31,7 +31,6 @@ AppDataSource.initialize()
       let film = await filmsRepository.findOneBy({id: id});
       if(film){
         film.characters = status;
-        console.log(film.characters)
         await filmsRepository.save(film)
       }
     }
@@ -43,7 +42,7 @@ AppDataSource.initialize()
         let peopleIds = peopleInFilms.map(obj => obj.people_id);
         return peopleIds
       }catch(err){
-        console.log(err)
+        // console.log(err)
         return []
       }
     }
@@ -62,13 +61,11 @@ AppDataSource.initialize()
           let filmRepository = await AppDataSource.getRepository(Films)
           for(let i = 0; i < filmsAPI.data.length; i++){
             let filmAPI = filmsAPI.data[i]
-            console.log(filmAPI)
             let episode_id = await filmRepository.findOneBy({episode_id: filmAPI.episode_id})
             if(!episode_id){
               let film = new Films()
               let filmUrlSplited = (filmAPI.url).split("/")
               let id = filmUrlSplited[filmUrlSplited.length - 1]
-              console.log(filmUrlSplited[filmUrlSplited.length - 1])
               film.id = id
               film.title = filmAPI.title
               film.episode_id = filmAPI.episode_id
@@ -88,18 +85,11 @@ AppDataSource.initialize()
 
     async function refillPeopleForThisFilm(res:Response, id:number) {
       let characters = await getPeopleIdWhitFilmId(id)
-      console.log("-------------------------------------")
-      console.log(characters.length)
       if(characters.length === 0){
-        console.log("-------------------------------------")
         if(!chekingPeopleForThisFilms.includes(id)){
-          console.log("-------------------------------------")
           chekingPeopleForThisFilms.push(id)
           try{
-            console.log("-------------------------------------")
-            console.log(id)
             let filmAPI = await AXIOS.get(`https://swapi.info/api/films/${id}/`);
-            console.log("-------------------------------------")
             let characters = filmAPI.data.characters
             for(let i = 0; i < characters.length; i++){
               let characterAPI = await AXIOS.get(characters[i]);
@@ -112,7 +102,6 @@ AppDataSource.initialize()
               if(characterInDB){
                 peopleInFilms.people_id = characterInDB.id
               }else{
-                console.log()
                 let people = new People()
                 people.id = characterIdFromApi
                 people.name = characterAPI.data.name
@@ -123,21 +112,14 @@ AppDataSource.initialize()
                 console.log(`Personaje ${people.name} guardado!`)
                 peopleInFilms.people_id = people.id
               }
-              console.log("1 GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
-              console.log(peopleInFilms.id)
-              console.log(peopleInFilms.film_id)
-              console.log(peopleInFilms.people_id)
               await AppDataSource.manager.save(peopleInFilms)
-              console.log("2 GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
               await updateCharactersStatus(id,true)
-              console.log("3 GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
             }
           }catch(err){
             saveError(502,'La API externa no funciona (Bad Gateway)');
             await updateCharactersStatus(id,false)
             // console.error(err)
           }finally{
-            console.log("sacando el check de", chekingPeopleForThisFilms)
             chekingPeopleForThisFilms = chekingPeopleForThisFilms.filter(item => item !== id);
           }
         }
@@ -176,10 +158,8 @@ AppDataSource.initialize()
               let filmsRepository = await AppDataSource.getRepository(Films)
               let films = await filmsRepository.find()
               if(films.length > 0){
-                console.log("Render 166")
                 res.render("infoTemplate", {results: films, searchFilm: true});
               }else{
-                console.log("Render 169")
                 res.render("infoTemplate", {error: error})
               }
             } else {
@@ -193,24 +173,20 @@ AppDataSource.initialize()
                 .where("LOWER(film.title) LIKE LOWER(:title)", { title: `%${someFilms}%` })
                 .getMany();
               if(films.length > 0){
-                console.log("Render 182")
                 res.render("infoTemplate",{results: films})
               }else{
-                console.log("Render 186")
                 saveError(404, "Not Found")
                 res.render("infoTemplate",{error: error})
               }
             }
           } else if (req.path.startsWith("/film")){
             try{
-              console.log("****----****")
               let filmId:number = parseInt(param)
               await refillPeopleForThisFilm(res,filmId)
               let filmsRepository = await AppDataSource.getRepository(Films)
               let film = await filmsRepository.findOneBy({id: filmId})
               if (film === null) {
                 saveError(404,"No se encontró la película, (Not found Error).")
-                console.log("Render 197")
                 res.render("infoTemplate",{error: error})
               }else{
                 let peopleIds = await getPeopleIdWhitFilmId(film.id)
@@ -220,26 +196,21 @@ AppDataSource.initialize()
                   .where("id IN (:...ids)", { ids: peopleIds })
                   .getMany();
                 if(characters.length > 0){
-                  console.log("Render 205")
                   res.render("infoTemplate",{film: film, characters: characters})
                 }else{
-                  console.log("Render 211")
                   res.render("infoTemplate",{film: film, error: error})
                 }
               }
             }catch{
-              console.log("Render 209")
               res.render("infoTemplate",{error: error})
             }
           } else {
             switch (req.path) {
               case "/":
-                console.log("Render 217")
                 res.render("homeTemplate");
                 break;
               default:
                 saveError(404,'No se encuentra una respuesta para la solicitud (Not Found)');
-                console.log("Render 223")
                 res.render("infoTemplate", {error: error});
                 break;
             }
@@ -251,7 +222,6 @@ AppDataSource.initialize()
               let paramNumber = parseInt(param);
               let filmsRepository = await AppDataSource.getRepository(Films)
               let film = await filmsRepository.findOneBy({id: paramNumber})
-              console.log(film)
               if(film){
                 let charactersIdsToDelete = await getPeopleIdWhitFilmId(film.id);
                 let peopleRepository = await AppDataSource.getRepository(People)
@@ -272,17 +242,13 @@ AppDataSource.initialize()
                 await updateCharactersStatus(film.id,false)
               }else{
                 saveError(404,'La película buscada no se encuentra (Not Found)');
-                console.log("Render 249")
                 res.render("infoTemplate", {error: error});
               }
               let films = await filmsRepository.find()
-              console.log(films)
-              console.log("Render 248")
               res.render("infoTemplate", {results: films});
             }catch(err){
               // console.error(err)
               saveError(400,'La solicitud de eliminacion no se pudo ejecutar, (Bad Request)');
-              console.log("Render 253")
               res.render("infoTemplate", {error: error});
             }
           }else{
@@ -310,14 +276,12 @@ AppDataSource.initialize()
               }
             }else{
               saveError(400,'La solicitud de eliminacion no se pudo ejecutar, (Bad Request)');
-              console.log("Render 290")
               res.render("infoTemplate", {error: error});
             }
           }
           break;
         default:
           saveError(501,"Método no implementado, (Not Implemented)");
-          console.log("Render 311")
           res.render("infoTemplate", {error: error});
           break;
       }
