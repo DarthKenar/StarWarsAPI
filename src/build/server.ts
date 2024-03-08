@@ -97,6 +97,7 @@ AppDataSource.initialize()
           chekingPeopleForThisFilms.push(id)
           try{
             console.log("-------------------------------------")
+            console.log(id)
             let filmAPI = await AXIOS.get(`https://swapi.info/api/films/${id}/`);
             console.log("-------------------------------------")
             let characters = filmAPI.data.characters
@@ -105,12 +106,13 @@ AppDataSource.initialize()
               let peopleRepository = await AppDataSource.getRepository(People)
               let characterInDB = await peopleRepository.findOneBy({name: characterAPI.data.name})
               let characterUrlSplited = characters[i].split('/')
-              let characterIdFromApi:number = Number(characterUrlSplited[characterUrlSplited.length - 2])
+              let characterIdFromApi:number = Number(characterUrlSplited[characterUrlSplited.length - 1])
               let peopleInFilms = new PeopleInFilms()
               peopleInFilms.film_id = id
               if(characterInDB){
                 peopleInFilms.people_id = characterInDB.id
               }else{
+                console.log()
                 let people = new People()
                 people.id = characterIdFromApi
                 people.name = characterAPI.data.name
@@ -122,6 +124,9 @@ AppDataSource.initialize()
                 peopleInFilms.people_id = people.id
               }
               console.log("1 GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
+              console.log(peopleInFilms.id)
+              console.log(peopleInFilms.film_id)
+              console.log(peopleInFilms.people_id)
               await AppDataSource.manager.save(peopleInFilms)
               console.log("2 GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
               await updateCharactersStatus(id,true)
@@ -197,6 +202,7 @@ AppDataSource.initialize()
             }
           } else if (req.path.startsWith("/film")){
             try{
+              console.log("****----****")
               let filmId:number = parseInt(param)
               await refillPeopleForThisFilm(res,filmId)
               let filmsRepository = await AppDataSource.getRepository(Films)
@@ -206,13 +212,12 @@ AppDataSource.initialize()
                 console.log("Render 197")
                 res.render("infoTemplate",{error: error})
               }else{
-                let peopleIds = await getPeopleIdWhitFilmId(film!.id)
+                let peopleIds = await getPeopleIdWhitFilmId(film.id)
                 let peopleRepository = await AppDataSource.getRepository(People)
                 let characters = await peopleRepository 
                   .createQueryBuilder("film")
                   .where("id IN (:...ids)", { ids: peopleIds })
                   .getMany();
-                  
                 if(characters.length > 0){
                   console.log("Render 205")
                   res.render("infoTemplate",{film: film, characters: characters})
@@ -233,7 +238,8 @@ AppDataSource.initialize()
                 break;
               default:
                 saveError(404,'La solicitud del cliente no está contemplada (Not Found)');
-                res.render("homeTemplate");
+                console.log("Render 223")
+                res.render("infoTemplate", {error: error});
                 break;
             }
           }
@@ -244,9 +250,11 @@ AppDataSource.initialize()
               let paramNumber = parseInt(param);
               let filmsRepository = await AppDataSource.getRepository(Films)
               let film = await filmsRepository.findOneBy({id: paramNumber})
+              console.log(film)
               if(film){
                 let charactersIdsToDelete = await getPeopleIdWhitFilmId(film.id);
                 let peopleRepository = await AppDataSource.getRepository(People)
+                //Elimina los Personajes relacionados con la película
                 await peopleRepository.createQueryBuilder()
                   .delete()
                   .from(People)
@@ -254,15 +262,20 @@ AppDataSource.initialize()
                   .execute();
                 let filmId = [film.id]
                 let peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
+                //Elimina los todos los registros de relacion entre la película y los personajes
                 await peopleInFilmsRepository.createQueryBuilder()
                   .delete()
                   .from(PeopleInFilms)
-                  .where("film_id IN (:...charactersIdsToDelete)", { filmId })
+                  .where("film_id IN (:...filmId)", { filmId })
                   .execute();
                 await updateCharactersStatus(film.id,false)
-                await AppDataSource.manager.save(peopleRepository)
+              }else{
+                saveError(404,'La película buscada no se encuentra (Not Found)');
+                console.log("Render 249")
+                res.render("infoTemplate", {error: error});
               }
               let films = await filmsRepository.find()
+              console.log(films)
               console.log("Render 248")
               res.render("infoTemplate", {results: films});
             }catch(err){
@@ -290,12 +303,14 @@ AppDataSource.initialize()
                 .execute();
             }else{
               saveError(400,'La solicitud de eliminacion no se pudo ejecutar, (Bad Request)');
+              console.log("Render 290")
               res.render("infoTemplate", {error: error});
             }
           }
           break;
         default:
           saveError(501,"Método no implementado, (Not Implemented)");
+          console.log("Render 311")
           res.render("infoTemplate", {error: error});
           break;
       }
