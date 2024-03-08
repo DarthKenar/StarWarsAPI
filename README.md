@@ -1,6 +1,46 @@
 # STAR WARS API para Kairox
 
+## Para ejecutar servidor local:
+
+Clonar repo:
+
+```Bash
+git clone https://github.com/DarthKenar/StarWarsAPI
+```
+
+Entramos a la ruta del Repo:
+
+```Bash
+cd StarWarsAPI
+```
+
+Instalamos dependencias:
+
+```Bash
+npm install
+```
+
+Compilamos Javascript con Typescript:
+
+```Bash
+npx tsc
+```
+
+Ejecutamos el servidor:
+
+```Bash
+node ./dist/build/server.js
+```
+
+Documentacion local:
+
+http://localhost:3000/api-docs
+
+---
+
 [Diagrama de modelos](./src/doc/models.mmd)
+
+---
 
 ## Objetivos
 
