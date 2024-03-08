@@ -1,31 +1,296 @@
 {
-    "openapi": "3.1.0",
-    "info": {
-      "title": "StarWars API para Kairox",
-      "version": "1.0.0"
+  "openapi": "3.0.3",
+  "info": {
+    "title": "StarWars API para Kairox - OpenAPI 3.0",
+    "description": "Prueba técnica para Kairox\n\nAPI simple que muestra los datos de las películas y Personajes relacionados con las mismas obteniendo su infomación de [https://swapi.info/](https://swapi.info/) (reemplazo)\n\nObjetivos:\n  # STAR WARS API para Kairox\n\n\n\n## Objetivos\n\nUtilizando la [API STAR WARS](https://swapi.dev/documentation) (original), podrás obtener las películas y personajes de cada entrega.\n(Requerido)\n\n---\n\nDesafío 1\n\nEs necesario tener todas las películas, para ello debemos guardar en una base local todas las películas con los campos que creas necesarios. Inicialmente se consulta a la BD local preguntando si existen esas películas, si no existen vamos a la API y guardamos las películas localmente para optimizar los tiempos de respuesta y no ir cada vez a la API externa.\n\nDesafío 2\n\nAl consultar cada película esta tiene que guardar en una base local todos los personajes relacionados a esta con los campos nombre, género, películas y especie. Inicialmente se consulta a la BD local preguntando si existen esos personajes, si no existen vamos a la API y guardamos los personajes localmente para optimizar los tiempos de respuesta y no ir cada vez a la API externa.\n\nDesafío 3\n\nCrear un endpoint que borre los personajes de la película indicada de la base de datos. Crear un endpoint que borre TODOS los datos de la Base de datos.\n\n---\n\nDesafío Opcional (Bonus extra)\n\n- Hacer un buscador de películas, especies.\n\n- Implementar login user y pass. Middleware de verificación token. (authentication)\n\nAclaraciones\n\n- Usar Node js (Typescript)\n- Utilizar Swagger para la documentación de la API (no excluyente)\n- La BD puede ser cualquiera\n- Se debe exponer el endpoint de consulta de películas para ser utilizada\n- Proponer diseño y lógica en cada desafío.\n- Se puede subir a github/gitlab y compartir el link o bien un zip.\n- Proponer manejo de errores (404, 401, 400, 500)\n\nLinks de interés:\n- [https://swapi.dev/](https://swapi.dev/ ) (obsoleta)\n- [https://swapi.info/](https://swapi.info/ )\n- [Handlebars](https://handlebarsjs.com/)\n- [TypeORM](https://typeorm.io/)\n- [HTMX](https://htmx.org/)\n- [Swagger](https://swagger.io/)",
+    "contact": {
+      "email": "federico.vega2222@gmail.com",
+      "url": "http://f-vega.com"
     },
-    "paths": {
-      "/films/all": {
-        "get": {
-          "summary": "Lista de todas las películas",
-          "responses": {
-            "200": {
-              "description": "Respuesta exitosa"
-            }
-          },
-          "tags": ["Películas"]
+    "license": {
+      "name": "GitHub - Repositorio",
+      "url": "https://github.com/DarthKenar/StarWarsAPI"
+    },
+    "version": "1.0.0"
+  },
+  "externalDocs": {
+    "description": "Whatsapp",
+    "url": "https://api.whatsapp.com/send/?phone=%2B5492615880318&text&type=phone_number&app_absent=0"
+  },
+  "tags": [
+    {
+      "name": "GET"
+    },
+    {
+      "name": "DELETE"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          "GET"
+        ],
+        "description": "Renderiza el index",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
         }
-      },
-      "/films/": {
-        "get": {
-          "summary": "Lista de todas las películas",
-          "responses": {
-            "200": {
-              "description": "Respuesta exitosa"
+      }
+    },
+    "/films/all": {
+      "get": {
+        "tags": [
+          "GET"
+        ],
+        "summary": "Busca todas las películas y las devuelve",
+        "description": "Devuelve todas las películas (Las busca en la API si no estan en la BD)",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Films"
+                  }
+                }
+              }
             }
           },
-          "tags": ["Películas"]
+          "502": {
+            "description": "La API externa no funciona - Bad Gateway"
+          }
+        }
+      }
+    },
+    "/films/": {
+      "get": {
+        "tags": [
+          "GET"
+        ],
+        "summary": "Busca una o multiples películas por nombre y la/s devuelve.",
+        "description": "Devuelve la lista de una o multiples películas.",
+        "parameters": [
+          {
+            "name": "searchFilm",
+            "in": "query",
+            "description": "Nombre de la película",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Films"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No se encontró la película, (Not found Error)."
+          },
+          "502": {
+            "description": "La API externa no funciona - Bad Gateway"
+          }
+        }
+      }
+    },
+    "/film/{film.id}": {
+      "get": {
+        "tags": [
+          "GET"
+        ],
+        "summary": "Busca una película por id y devuelve la misma y su lista de personajes.",
+        "description": "Devuelve la película y una lista de los personajes que están en la misma. (Los busca en la API si no estan en la BD)",
+        "parameters": [
+          {
+            "name": "film.id",
+            "in": "path",
+            "description": "Nombre de la película",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Films"
+                    },
+                    {
+                      "$ref": "#/components/schemas/People"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No se encuentra la película solicitada - Not found"
+          },
+          "502": {
+            "description": "La API externa no funciona - Bad Gateway"
+          }
+        }
+      }
+    },
+    "/delete/all": {
+      "delete": {
+        "tags": [
+          "DELETE"
+        ],
+        "summary": "Elimina todas las películas",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Films"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "La solicitud de eliminacion no se pudo ejecutar - Bad Request"
+          }
+        }
+      }
+    },
+    "/delete/film/{film.id}": {
+      "delete": {
+        "tags": [
+          "DELETE"
+        ],
+        "summary": "Elimina todas los personajes relacionados con una película.",
+        "description": "Elimina todas los personajes relacionados con una película.",
+        "parameters": [
+          {
+            "name": "film.id",
+            "in": "path",
+            "description": "Id de la película",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/People"
+                    },
+                    {
+                      "$ref": "#/components/schemas/PeopleInFilms"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "La solicitud de eliminacion no se pudo ejecutar - Bad Request"
+          }
         }
       }
     }
+  },
+  "components": {
+    "schemas": {
+      "Films": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 6
+          },
+          "title": {
+            "type": "integer",
+            "format": "int64",
+            "example": "A new Hope"
+          },
+          "episode_id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 2
+          },
+          "characters": {
+            "type": "boolean",
+            "description": "Flag",
+            "example": true,
+            "enum": [
+              true,
+              false
+            ]
+          }
+        }
+      },
+      "People": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 17
+          },
+          "name": {
+            "type": "string",
+            "example": "Anakin Skywalker"
+          },
+          "gender": {
+            "type": "string",
+            "example": "male"
+          },
+          "species": {
+            "type": "string",
+            "example": "human"
+          }
+        }
+      },
+      "PeopleInFilms": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "film_id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 6
+          },
+          "people_id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 23
+          }
+        }
+      }
+    }
+  }
 }
