@@ -29,11 +29,12 @@ routerFilm.get("/:id", async (req:Request, res:Response)=>{
   }
 })
 
-routerFilm.get("/s", async (req:Request, res:Response) => {
+routerFilm.get("/s/search", async (req:Request, res:Response) => {
   console.log("Parametro buscado:", req.query.searchFilm)
   let someFilms:string = String(req.query.searchFilm);
   //https://www.tutorialspoint.com/typeorm/typeorm_query_builder.htm
   //https://typeorm.io/#using-querybuilder
+  console.log(someFilms)
   let filmsRepository = await AppDataSource.getRepository(Films)
   let films = await filmsRepository
     .createQueryBuilder("film")

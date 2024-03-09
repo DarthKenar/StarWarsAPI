@@ -63,7 +63,7 @@
         }
       }
     },
-    "/film/s": {
+    "/film/s/search": {
       "get": {
         "tags": [
           "FILM"
