@@ -3,9 +3,10 @@ import express from 'express';
 
 import { engine } from 'express-handlebars';
 import { AppDataSource } from "../database/data-source";
+import { Request, Response } from 'express';
 
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('../docs/swagger.json');
+const swaggerDocument = require('../../src/docs/swagger.json');
 
 const app = express()
 const PATH = require("path")
@@ -22,10 +23,16 @@ AppDataSource.initialize()
     //https://editor.swagger.io/
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+
     //Routers
     const routerFilm = require('./routers/film.js');
-    app.use('', routerFilm);
+    app.use('/film', routerFilm);
     //...
+
+    app.get("/",(req:Request, res:Response)=>{
+      res.render("homeTemplate");
+    })
+
 
     const PORT = process.env.PORT || 3000
 
