@@ -13,8 +13,9 @@ export var error = {
 }
 
 //ESTA FUNCION DEBE REFACTORIZARSE PARA DEVOLVER LOS ERRORES EN EL MISMO res
-export function saveError(codeError:number, errorInfo:string){
-  error.code = codeError
+export function saveError(res:Response, errorCode:number, errorInfo:string){
+  res.statusCode = errorCode
+  error.code = errorCode
   error.info = errorInfo;
 };
 
@@ -41,7 +42,7 @@ export async function refillFilmsInDB(res:Response){
         }
       }
     }catch(err){
-      saveError(502,"La API externa no funciona. (Bad Gateway)")
+      saveError(res, 502,"La API externa no funciona. (Bad Gateway)")
       console.error(err)
     }finally{
       chekingFilms = false
@@ -82,7 +83,7 @@ export async function refillPeopleForThisFilm(res:Response, id:number) {
           await updateFilmCharactersStatus(id,true)
         }
       }catch(err){
-        saveError(502,'La API externa no funciona (Bad Gateway)');
+        saveError(res, 502,'La API externa no funciona (Bad Gateway)');
         await updateFilmCharactersStatus(id,false)
         // console.error(err)
       }finally{
@@ -120,7 +121,7 @@ export async function getSpecieFromThisUrl(res:Response, url:string) {
       return species.data.name
     }catch(err){
       // console.error(err)
-      saveError(502,'La API externa no funciona, (Bad Gateway).');
+      saveError(res, 502, 'La API externa no funciona, (Bad Gateway).');
     }
   }else{
     return "human"
