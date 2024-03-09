@@ -58,7 +58,7 @@
             }
           },
           "502": {
-            "description": "La API externa no funciona - Bad Gateway"
+            "description": "Bad Gateway."
           }
         }
       }
@@ -93,10 +93,10 @@
             }
           },
           "404": {
-            "description": "No se encontró la película, (Not found Error)."
+            "description": "No se encontraron películas para la búsqueda..."
           },
           "502": {
-            "description": "La API externa no funciona - Bad Gateway"
+            "description": "Bad Gateway."
           }
         }
       }
@@ -137,11 +137,14 @@
               }
             }
           },
+          "400": {
+            "description": "La solicitud es incorrecta."
+          },
           "404": {
-            "description": "No se encuentra la película solicitada - Not found"
+            "description": "No se encontró la película."
           },
           "502": {
-            "description": "La API externa no funciona - Bad Gateway"
+            "description": "Bad Gateway."
           }
         }
       }
@@ -166,8 +169,8 @@
               }
             }
           },
-          "400": {
-            "description": "La solicitud de eliminacion no se pudo ejecutar - Bad Request"
+          "503": {
+            "description": "El servidor no está listo para manejar la petición."
           }
         }
       }
@@ -209,7 +212,13 @@
             }
           },
           "400": {
-            "description": "La solicitud de eliminacion no se pudo ejecutar - Bad Request"
+            "description": "La solicitud es incorrecta."
+          },
+          "404": {
+            "description": "La película a eliminar no se encuentra."
+          },
+          "503": {
+            "description": "El servidor no está listo para manejar la petición."
           }
         }
       }

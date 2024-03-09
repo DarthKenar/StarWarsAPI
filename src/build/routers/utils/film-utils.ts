@@ -42,7 +42,7 @@ export async function refillFilmsInDB(res:Response){
         }
       }
     }catch(err){
-      saveError(res, 502,"La API externa no funciona. (Bad Gateway)")
+      saveError(res, 502,'Bad Gateway.')
       console.error(err)
     }finally{
       chekingFilms = false
@@ -83,7 +83,7 @@ export async function refillPeopleForThisFilm(res:Response, id:number) {
           await updateFilmCharactersStatus(id,true)
         }
       }catch(err){
-        saveError(res, 502,'La API externa no funciona (Bad Gateway)');
+        saveError(res, 502,'Bad Gateway.');
         await updateFilmCharactersStatus(id,false)
         // console.error(err)
       }finally{
@@ -121,7 +121,7 @@ export async function getSpecieFromThisUrl(res:Response, url:string) {
       return species.data.name
     }catch(err){
       // console.error(err)
-      saveError(res, 502, 'La API externa no funciona, (Bad Gateway).');
+      saveError(res, 502, 'Bad Gateway.');
     }
   }else{
     return "human"
