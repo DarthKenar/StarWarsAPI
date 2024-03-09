@@ -1,12 +1,10 @@
 import { AppDataSource } from "../../database/data-source";
 import { Films, People, PeopleInFilms} from "../../database/entity/Models";
 import { Request, Response } from 'express';
+import { error, saveError, refillFilmsInDB, refillPeopleForThisFilm,updateFilmCharactersStatus, getPeopleIdWhitFilmId} from "./utils/film-utils"
 
 const express = require('express');
-const app = express()
 const routerFilm = express.Router();
-
-import { error, saveError, refillFilmsInDB, refillPeopleForThisFilm,updateFilmCharactersStatus, getPeopleIdWhitFilmId} from "./utils/film-utils"
 
 routerFilm.get("/:id", async (req:Request, res:Response)=>{
   let filmId:number = parseInt(req.params.id)
@@ -67,7 +65,6 @@ routerFilm.delete("/del/:id", async (req:Request, res:Response)=>{
   if(film){
     let charactersIdsToDelete = await getPeopleIdWhitFilmId(film.id);
     let peopleRepository = await AppDataSource.getRepository(People)
-    //Elimina los Personajes relacionados con la película
     await peopleRepository.createQueryBuilder()
       .delete()
       .from(People)
@@ -75,7 +72,6 @@ routerFilm.delete("/del/:id", async (req:Request, res:Response)=>{
       .execute();
     let filmId = [film.id]
     let peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
-    //Elimina los todos los registros de relacion entre la película y los personajes
     await peopleInFilmsRepository.createQueryBuilder()
       .delete()
       .from(PeopleInFilms)
