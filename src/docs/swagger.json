@@ -19,17 +19,14 @@
   },
   "tags": [
     {
-      "name": "GET"
-    },
-    {
-      "name": "DELETE"
+      "name": "FILM"
     }
   ],
   "paths": {
     "/": {
       "get": {
         "tags": [
-          "GET"
+          "FILM"
         ],
         "description": "Renderiza el index",
         "responses": {
@@ -39,10 +36,10 @@
         }
       }
     },
-    "/films/all": {
+    "/film/s/all": {
       "get": {
         "tags": [
-          "GET"
+          "FILM"
         ],
         "summary": "Busca todas las películas y las devuelve",
         "description": "Devuelve todas las películas (Las busca en la API si no estan en la BD)",
@@ -66,10 +63,10 @@
         }
       }
     },
-    "/films/": {
+    "/film/s": {
       "get": {
         "tags": [
-          "GET"
+          "FILM"
         ],
         "summary": "Busca una o multiples películas por nombre y la/s devuelve.",
         "description": "Devuelve la lista de una o multiples películas.",
@@ -107,7 +104,7 @@
     "/film/{film.id}": {
       "get": {
         "tags": [
-          "GET"
+          "FILM"
         ],
         "summary": "Busca una película por id y devuelve la misma y su lista de personajes.",
         "description": "Devuelve la película y una lista de los personajes que están en la misma. (Los busca en la API si no estan en la BD)",
@@ -149,10 +146,10 @@
         }
       }
     },
-    "/delete/all": {
+    "/film/s/del/all": {
       "delete": {
         "tags": [
-          "DELETE"
+          "FILM"
         ],
         "summary": "Elimina todas las películas",
         "responses": {
@@ -175,10 +172,10 @@
         }
       }
     },
-    "/delete/film/{film.id}": {
+    "/film/del/{film.id}": {
       "delete": {
         "tags": [
-          "DELETE"
+          "FILM"
         ],
         "summary": "Elimina todas los personajes relacionados con una película.",
         "description": "Elimina todas los personajes relacionados con una película.",
