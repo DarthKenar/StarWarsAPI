@@ -4,7 +4,7 @@ import { People, Films, PeopleInFilms} from "./entity/Models"
 
 export const AppDataSource = new DataSource({
     type: "sqlite",
-    database: "database.sqlite",
+    database: "../database/database.sqlite",
     synchronize: true,
     logging: false,
     entities: [Films,People,PeopleInFilms],
