@@ -1,5 +1,5 @@
 import { AppDataSource } from "../../database/data-source";
-import { Films, People, PeopleInFilms} from "../../database/entity/Models";
+import { Films, People, PeopleInFilms} from "../../database/entity/models";
 import { Request, Response } from 'express';
 import { error, saveError, refillFilmsInDB, refillPeopleForThisFilm,updateFilmCharactersStatus, getPeopleIdWhitFilmId} from "./utils/film-utils"
 
