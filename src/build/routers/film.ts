@@ -13,7 +13,7 @@ routerFilm.get("/:id", async (req:Request, res:Response)=>{
     let filmsRepository = await AppDataSource.getRepository(Films)
     let film = await filmsRepository.findOneBy({id: filmId})
     if (film === null) {
-      saveError(res, 404, `No se encontró la película ${req.params.id}.`)
+      saveError(404, `No se encontró la película ${req.params.id}.`)
       res.render("infoTemplate",{error: error})
     }else{
       let peopleIds = await getPeopleIdWhitFilmId(film.id)
@@ -25,12 +25,12 @@ routerFilm.get("/:id", async (req:Request, res:Response)=>{
       if(characters.length > 0){
         res.render("infoTemplate",{film: film, characters: characters})
       }else{
-        saveError(res,502,"Bad Gateway.")
+        saveError(502,"Bad Gateway.")
         res.render("infoTemplate",{film: film, error: error})
       }
     }
   }else{
-    saveError(res, 400,`La solicitud "${req.params.id}" es incorrecta.`)
+    saveError(400,`La solicitud "${req.params.id}" es incorrecta.`)
     res.render("infoTemplate",{error: error})
   }
 })
@@ -48,7 +48,7 @@ routerFilm.get("/s/search", async (req:Request, res:Response) => {
   if(films.length > 0){
     res.render("infoTemplate",{results: films})
   }else{
-    saveError(res, 404, `No se encontraron películas para la búsqueda "${req.query.searchFilm}"`)
+    saveError(404, `No se encontraron películas para la búsqueda "${req.query.searchFilm}"`)
     res.render("infoTemplate",{error: error})
   }
 })
@@ -89,15 +89,15 @@ routerFilm.delete("/del/:id", async (req:Request, res:Response)=>{
         let films = await filmsRepository.find()
         res.render("infoTemplate", {results: films});
       }catch{
-        saveError(res, 503, "El servidor no está listo para manejar la petición.")
+        saveError(503, "El servidor no está listo para manejar la petición.")
         res.render("infoTemplate", {error: error});
       }
     }else{
-      saveError(res, 404, `La película ${req.params.id} a eliminar no se encuentra.`);
+      saveError(404, `La película ${req.params.id} a eliminar no se encuentra.`);
       res.render("infoTemplate", {error: error});
     }
   }else{
-    saveError(res, 400, `La solicitud "${req.params.id}" es incorrecta.`)
+    saveError(400, `La solicitud "${req.params.id}" es incorrecta.`)
     res.render("infoTemplate",{error: error})
   }
 })
@@ -121,7 +121,7 @@ routerFilm.delete("/s/del/all",async(req:Request,res:Response) =>{
         .execute();
     res.render("homeTemplate");
   }catch{
-    saveError(res, 503, "El servidor no está listo para manejar la petición.")
+    saveError(503, "El servidor no está listo para manejar la petición.")
     res.render("infoTemplate", {error: error});
   }
 })

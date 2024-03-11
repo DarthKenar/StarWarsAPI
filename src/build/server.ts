@@ -34,10 +34,10 @@ AppDataSource.initialize()
     //Middleware 404
     app.use((req:Request, res:Response)=>{
       if(req.method !== "GET" && req.method !== "DELETE"){
-        saveError(res, 501, "El método solicitado no está soportado por el servidor y no puede ser manejado.")
+        saveError(501, "El método solicitado no está soportado por el servidor y no puede ser manejado.")
         res.render("infoTemplate",{error: error});
       }else{
-        saveError(res, 404, "La pagina solicitada no se encuentra.")
+        saveError(404, "La pagina solicitada no se encuentra.")
         res.render("infoTemplate",{error: error});
       }
 
