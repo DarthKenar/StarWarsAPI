@@ -120,8 +120,6 @@ ProjectRoot
 
 8. "typeorm": "^0.3.20"
 
-9. Typescript
-
 **Dev Dependencies** 
 
 1. "@types/express": "^4.17.21",
@@ -136,7 +134,9 @@ ProjectRoot
 
 6. "ts-jest": "^29.1.2",
 
-7. "typescript": "^5.3.3"
+7. "supertest": "^6.3.4",
+
+8. "typescript": "^5.3.3"
 
 ## Objetivos
 
