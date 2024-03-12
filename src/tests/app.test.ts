@@ -1,4 +1,4 @@
-import app from "../../src/build/app";
+import app from "../build/app";
 import request from "supertest";
 import { AppDataSource } from "../database/data-source";
 
