@@ -3,7 +3,7 @@ import { AppDataSource } from "../../database/data-source";
 import { Films, People, PeopleInFilms} from "../../database/entity/models";
 import { error, saveError, refillFilmsInDB, refillPeopleForThisFilm,updateFilmCharactersStatus, getPeopleIdFromDbWhitFilmId} from "../utils/film.utils"
 
-export const getFilm = async (req:Request, res:Response)=>{
+export const getFilmById = async (req:Request, res:Response)=>{
     let filmId:number = parseInt(req.params.id)
     if(!isNaN(filmId)){
       await refillPeopleForThisFilm(res,filmId)

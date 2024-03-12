@@ -1,17 +1,15 @@
-
-
 const express = require('express');
 const routerFilm = express.Router();
 
 import {
-  getFilm,
+  getFilmById,
   getFilmsByName,
   getFilmsAll,
   delFilmById,
   delFilmsAll
 } from "../controllers/film.controller"
 
-routerFilm.get("/:id", getFilm)
+routerFilm.get("/:id", getFilmById)
 
 routerFilm.get("/s/search", getFilmsByName)
 
