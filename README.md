@@ -54,20 +54,6 @@ http://localhost:3000/
 
 ---
 
-## API Routes
-
-| Host | Method | RoutePath | Middeware | Action |
-|--|--|--|--|--|
-| localhost:3000 | GET  |`"/index"`  | checkJwt | Index View  |
-| localhost:3000 | GET  |`"/login"`  | isLogged | Login View |
-| localhost:3000 | POST  |`"/login"`  | loginAuth  | redirected to IndexPage  |
-| localhost:3000 | GET  |`"/logout"`  | null | null |
-| localhost:3000 | GET  |`"/api/teachers/"`  | checkJwt | Get AllTeachers |
-| localhost:3000 | GET  |`"/api/teachers/{:id}"`  | checkJwt | Get OneTeacher 
-| localhost:3000 | POST  |`"/api/teachers/"`  | checkJwt | Create Teacher 
-| localhost:3000 | PATCH  |`"/api/teachers/{:id}"`  | checkJwt | Update Teacher 
-| localhost:3000 | DELETE  |`"/api/teachers/{:id}"`  | checkJwt | Destroy Teacher 
-
 # Project Structure
 
 ```
