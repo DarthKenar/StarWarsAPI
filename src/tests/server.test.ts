@@ -1,6 +1,21 @@
-// app.test.ts
-// import { prueba } from '../build/server';
+import app from "../../src/build/server";
+import request from "supertest";
+import { TestDataSource } from "../database/data-source";
 
-// test('adds 1 + 2 to equal 3', () => {
-//   expect(prueba(1, 2)).toBe(3);
+// Mock the entire AppDataSource module
+
+// beforeAll(async () => {
+//   await TestDataSource.initialize();
+// });
+
+describe("GET /film", () => {
+    test("/", async ()=>{
+        const response = await request(app).get("/").send()
+        console.log(response)
+        expect(response.statusCode).toBe(200);
+    })
+})
+
+// afterAll(async () => {
+//   await TestDataSource.dropDatabase();
 // });

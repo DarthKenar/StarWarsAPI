@@ -110,7 +110,6 @@
     "./src/build/*.ts",
     "./src/database/data-source.ts",
     "./src/build/routers/*.ts",
-    "./src/tests/*.ts",
   ],
   "exclude": [
     "node_modules"
