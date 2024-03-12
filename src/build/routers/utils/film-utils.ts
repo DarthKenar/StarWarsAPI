@@ -12,14 +12,15 @@ export var error = {
   info: ""
 }
 
-//ESTA FUNCION DEBE REFACTORIZARSE PARA DEVOLVER LOS ERRORES EN EL MISMO res
 export function saveError(errorCode:number, errorInfo:string){
+  //Dado que htmx no renderiza cuando hay codigos de estados distintos a 200, pasamos los errores por contexto.
+  //
   error.code = errorCode
   error.info = errorInfo;
 };
 
 export async function refillFilmsInDB(res:Response){
-  //Completa la base de datos con las películas de la API
+  //Busca las películas en la API externa y las guarda en la DB
   if(!chekingFilms){
     chekingFilms = true;
     try{
@@ -50,7 +51,8 @@ export async function refillFilmsInDB(res:Response){
 }
 
 export async function refillPeopleForThisFilm(res:Response, id:number) {
-  let characters = await getPeopleIdWhitFilmId(id)
+  //Busca los personajes asociados con la película en la API externa y los guarda en la DB
+  let characters = await getPeopleIdFromDbWhitFilmId(id)
   if(characters.length === 0){
     if(!chekingPeopleForThisFilms.includes(id)){
       chekingPeopleForThisFilms.push(id)
@@ -84,7 +86,6 @@ export async function refillPeopleForThisFilm(res:Response, id:number) {
       }catch(err){
         saveError(502,'Bad Gateway.');
         await updateFilmCharactersStatus(id,false)
-        // console.error(err)
       }finally{
         chekingPeopleForThisFilms = chekingPeopleForThisFilms.filter(item => item !== id);
       }
@@ -92,7 +93,8 @@ export async function refillPeopleForThisFilm(res:Response, id:number) {
   }
 }
 
-export async function updateFilmCharactersStatus(id:number, status:boolean) {//updateFilmCharactersStatus
+export async function updateFilmCharactersStatus(id:number, status:boolean) {
+  //Actualiza el estado de film.characters (que determina si tiene o no los personajes asociados guardados en la DB.)
     let filmsRepository = await AppDataSource.getRepository(Films)
     let film = await filmsRepository.findOneBy({id: id});
     if(film){
@@ -101,28 +103,30 @@ export async function updateFilmCharactersStatus(id:number, status:boolean) {//u
     }
   }
   
-export async function getPeopleIdWhitFilmId(id:number){
+export async function getPeopleIdFromDbWhitFilmId(id:number):Promise<number[]>{
+  //Devuelve una lista de los ID de los personajes asociados al ID de una película.
   try{
     let peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
     let peopleInFilms = await peopleInFilmsRepository.findBy({film_id: id})
     let peopleIds = peopleInFilms.map(obj => obj.people_id);
     return peopleIds
   }catch(err){
-    // console.log(err)
+    saveError(400, 'Ha ocurrido un error al intentar obtener los ID de los personajes');
     return []
   }
 }
   
-export async function getSpecieFromThisUrl(res:Response, url:string) {
+export async function getSpecieFromThisUrl(res:Response, url:string):Promise<string>{
+  //Devuelve el nombre de la especie obtenida en la API externa
   if(url){
-    try{
-      let species = await AXIOS.get(url)
+    let species = await AXIOS.get(url)
+    if(typeof species.data.name === "string"){
       return species.data.name
-    }catch(err){
-      // console.error(err)
-      saveError(502, 'Bad Gateway.');
+    }else{
+      return "undefined"
     }
   }else{
+    //en la API externa los humanos no tienen URL
     return "human"
   }
 }

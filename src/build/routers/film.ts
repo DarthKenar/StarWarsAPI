@@ -1,7 +1,7 @@
 import { AppDataSource } from "../../database/data-source";
 import { Films, People, PeopleInFilms} from "../../database/entity/models";
 import { Request, Response } from 'express';
-import { error, saveError, refillFilmsInDB, refillPeopleForThisFilm,updateFilmCharactersStatus, getPeopleIdWhitFilmId} from "./utils/film-utils"
+import { error, saveError, refillFilmsInDB, refillPeopleForThisFilm,updateFilmCharactersStatus, getPeopleIdFromDbWhitFilmId} from "./utils/film-utils"
 
 const express = require('express');
 const routerFilm = express.Router();
@@ -16,7 +16,7 @@ routerFilm.get("/:id", async (req:Request, res:Response)=>{
       saveError(404, `No se encontró la película ${req.params.id}.`)
       res.render("infoTemplate",{error: error})
     }else{
-      let peopleIds = await getPeopleIdWhitFilmId(film.id)
+      let peopleIds = await getPeopleIdFromDbWhitFilmId(film.id)
       let peopleRepository = await AppDataSource.getRepository(People)
       let characters = await peopleRepository 
         .createQueryBuilder("film")
@@ -71,7 +71,7 @@ routerFilm.delete("/del/:id", async (req:Request, res:Response)=>{
     let film = await filmsRepository.findOneBy({id: filmId})
     if(film){
       try{
-        let charactersIdsToDelete = await getPeopleIdWhitFilmId(film.id);
+        let charactersIdsToDelete = await getPeopleIdFromDbWhitFilmId(film.id);
         let peopleRepository = await AppDataSource.getRepository(People)
         await peopleRepository.createQueryBuilder()
           .delete()
