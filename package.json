@@ -4,7 +4,9 @@
   "description": "Desarrollo de API StarWars para prueba técnica en Cairox",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "dev": "nodemon dist/build/server.js",
+    "build": "tsc -w"
   },
   "author": "Federico Vega",
   "license": "ISC",
