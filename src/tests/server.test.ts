@@ -1,21 +1,20 @@
-// import app from "../../src/build/server";
-// import request from "supertest";
-// import { TestDataSource } from "../database/data-source";
+import app from "../../src/build/app";
+import request from "supertest";
+import { AppDataSource } from "../database/data-source";
 
-// Mock the entire AppDataSource module
+beforeAll(async () => {
+  await AppDataSource.initialize();
+});
 
-// beforeAll(async () => {
-//   await TestDataSource.initialize();
-// });
+describe("GET /film", () => {
+    test("/", async ()=>{
+        const response = await request(app).get("/").send().expect(200).end(function(err, res) {
+            if (err) throw err;
+          });
+        console.log(response)
+    })
+})
 
-// describe("GET /film", () => {
-//     test("/", async ()=>{
-//         const response = await request(app).get("/").send()
-//         console.log(response)
-//         expect(response.statusCode).toBe(200);
-//     })
-// })
-
-// afterAll(async () => {
-//   await TestDataSource.dropDatabase();
-// });
+afterAll(async () => {
+  await AppDataSource.dropDatabase();
+});
