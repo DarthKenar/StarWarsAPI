@@ -38,7 +38,11 @@ http://localhost:3000/api-docs
 
 ---
 
-### Ir a:
+### Servidor local:
+
+```Bash
+npm run dev
+```
 
 http://localhost:3000/
 
