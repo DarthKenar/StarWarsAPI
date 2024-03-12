@@ -109,7 +109,7 @@
   "include": [
     "./src/build/*.ts",
     "./src/database/data-source.ts",
-    "./src/build/routers/*.ts",
+    "src/build/routes/*.ts",
   ],
   "exclude": [
     "node_modules"

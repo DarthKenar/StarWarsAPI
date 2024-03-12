@@ -83,10 +83,12 @@ ProjectRoot
 │   │   ├── infoTemplate.handlebars       				// Template que muestra toda la informacion independientemente del path.
 ├── src              				// Carpeta de codigo fuente.
 │   ├── build       				// Carpeta de compilación.
-│   │   └── routes  	 			// Rutas de la API.
-│   │   │   └── utils	            // Carpeta contenedora de funciones útiles.
-│   │   │   │   └── film-utils.ts	// funciones útiles para film.ts.
-│   │   │   film.ts     	        // Rutas definidas para el modelo Film.
+│   │   └── controllers  	 		// Carpeta contenedora de los controladores de las rutas.
+│   │   │   └── film.controller.ts  // Controladores de las rutas para film.
+│   │   └── routes  	 			// Carpeta de rutas de la API.
+│   │   │   └── film.routes.ts     	// Rutas definidas para el modelo Film.
+│   │   └── utils	                // Carpeta contenedora de funciones útiles.
+│   │   │   └── film.utils.ts	    // funciones útiles para film.routes.ts.
 │   │   └── app.ts  				// Archivo de centralizacion de rutas.
 │   │   └── index.ts  				// Archivo de ejecucion del servidor.
 │   ├── database  				    // Carpeta referente a la base de datos.
