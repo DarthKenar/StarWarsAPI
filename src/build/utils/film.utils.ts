@@ -1,5 +1,5 @@
-import { AppDataSource } from "../../../database/data-source";
-import { Films, People, PeopleInFilms} from "../../../database/entity/models";
+import { AppDataSource } from "../../database/data-source";
+import { Films, People, PeopleInFilms} from "../../database/entity/models";
 import { Response } from 'express';
 
 const AXIOS = require("axios")
