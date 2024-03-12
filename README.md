@@ -87,7 +87,8 @@ ProjectRoot
 │   │   │   └── utils	            // Carpeta contenedora de funciones útiles.
 │   │   │   │   └── film-utils.ts	// funciones útiles para film.ts.
 │   │   │   film.ts     	        // Rutas definidas para el modelo Film.
-│   │   └── server.ts  				// Archivo principal de ejecucion del servidor.
+│   │   └── app.ts  				// Archivo de centralizacion de rutas.
+│   │   └── index.ts  				// Archivo de ejecucion del servidor.
 │   ├── database  				    // Carpeta referente a la base de datos.
 │   │   └── entity  	 			// Carpeta contenedora de los modelos.
 │   │   │   └── models.ts	        // archivo de definición de los modelos de la base de datos.
