@@ -19,7 +19,7 @@ app.set('views', PATH.join(__dirname, '../views'));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 //Routers
-const routerFilm = require('./routes/film');
+const routerFilm = require('./routes/film.routes');
 app.use('/film', routerFilm);
 //...
 
