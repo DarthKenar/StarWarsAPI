@@ -34,7 +34,7 @@ node ./dist/build/server.js
 
 Documentacion local:
 
-http://localhost:3000/api-docs
+http://localhost:8000/api-docs
 
 ---
 
@@ -44,7 +44,7 @@ http://localhost:3000/api-docs
 npm run dev
 ```
 
-http://localhost:3000/
+http://localhost:8000/
 
 ---
 
@@ -57,14 +57,14 @@ http://localhost:3000/
 
 | Host | Method | RoutePath | Action |
 |--|--|--|--|
-| localhost:3000 | GET  |`"/"`| Muestra el Home |
-| localhost:3000 | GET  |`"/film/s/all"`| Muestra todas las películas  |
-| localhost:3000 | GET  |`"/film/:id"`| Muestra una película |
-| localhost:3000 | GET  |`"/film/s/search"`| Muestra una lista de películas por nombre |
-| localhost:3000 | DELETE  |`"/film/del/:id"`| Borra una película y sus personajes asociados. |
-| localhost:3000 | DELETE  |`"/film/s/del/all"`| Borra todas las películas y todos los personajes asociados |
+| localhost:8000 | GET  |`"/"`| Muestra el Home |
+| localhost:8000 | GET  |`"/film/s/all"`| Muestra todas las películas  |
+| localhost:8000 | GET  |`"/film/:id"`| Muestra una película |
+| localhost:8000 | GET  |`"/film/s/search"`| Muestra una lista de películas por nombre |
+| localhost:8000 | DELETE  |`"/film/del/:id"`| Borra una película y sus personajes asociados. |
+| localhost:8000 | DELETE  |`"/film/s/del/all"`| Borra todas las películas y todos los personajes asociados |
 |--|--|--|--|
-| localhost:3000 | GET  |`"/api-docs"` | Muestra la documentación |
+| localhost:8000 | GET  |`"/api-docs"` | Muestra la documentación |
 
 # Project Structure
 
@@ -113,17 +113,13 @@ ProjectRoot
 
 2. "express": "^4.18.2",
 
-3. "express-handlebars": "^7.1.2",
+3. "reflect-metadata": "^0.2.1",
 
-4. "handlebars": "^4.7.8",
+4. "sqlite3": "^5.1.7",
 
-5. "reflect-metadata": "^0.2.1",
+5. "swagger-ui-express": "^5.0.0",
 
-6. "sqlite3": "^5.1.7",
-
-7. "swagger-ui-express": "^5.0.0",
-
-8. "typeorm": "^0.3.20"
+6. "typeorm": "^0.3.20"
 
 **Dev Dependencies** 
 
