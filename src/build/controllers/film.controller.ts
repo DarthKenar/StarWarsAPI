@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../../database/data-source";
 import { Films, People, PeopleInFilms} from "../../database/entity/models";
-import { error, saveError, refillFilmsInDB, refillPeopleForThisFilm,updateFilmCharactersStatus, getPeopleIdFromDbWhitFilmId} from "../utils/film.utils"
+import { refillFilmsInDB, refillPeopleForThisFilm,updateFilmCharactersStatus, getPeopleIdFromDbWhitFilmId} from "../utils/film.utils"
 
 export const getFilmById = async (req:Request, res:Response)=>{
     let filmId:number = parseInt(req.params.id)
@@ -10,8 +10,7 @@ export const getFilmById = async (req:Request, res:Response)=>{
       let filmsRepository = await AppDataSource.getRepository(Films)
       let film = await filmsRepository.findOneBy({id: filmId})
       if (film === null) {
-        saveError(404, `No se encontró la película ${req.params.id}.`)
-        res.render("infoTemplate",{error: error})
+        res.status(404).json({error: `No se encontró la película ${req.params.id}.`})
       }else{
         let peopleIds = await getPeopleIdFromDbWhitFilmId(film.id)
         let peopleRepository = await AppDataSource.getRepository(People)
@@ -20,15 +19,13 @@ export const getFilmById = async (req:Request, res:Response)=>{
           .where("id IN (:...ids)", { ids: peopleIds })
           .getMany();
         if(characters.length > 0){
-          res.render("infoTemplate",{film: film, characters: characters})
+          res.json({film: film, "characters": characters})
         }else{
-          saveError(502,"Bad Gateway.")
-          res.render("infoTemplate",{film: film, error: error})
+          res.json({film: film, error: "Bad Gateway."})
         }
       }
     }else{
-      saveError(400,`La solicitud "${req.params.id}" es incorrecta.`)
-      res.render("infoTemplate",{error: error})
+      res.status(400).json({error: `La solicitud "${req.params.id}" es incorrecta.`})
     }
   }
 
@@ -43,23 +40,22 @@ export const getFilmsByName = async (req:Request, res:Response) => {
       .where("LOWER(film.title) LIKE LOWER(:title)", { title: `%${someFilms}%` })
       .getMany();
     if(films.length > 0){
-      res.render("infoTemplate",{results: films})
+      res.json({results: films})
     }else{
-      saveError(404, `No se encontraron películas para la búsqueda "${req.query.searchFilm}"`)
-      res.render("infoTemplate",{error: error})
+      res.status(404).json({error: `No se encontraron películas para la búsqueda "${req.query.searchFilm}"`})
     }
   }
 
 export const getFilmsAll = async (req:Request, res:Response) => {
+  try{
     await refillFilmsInDB(res)
     let filmsRepository = await AppDataSource.getRepository(Films)
     let films = await filmsRepository.find()
-    if(films.length > 0){
-      res.render("infoTemplate", {results: films, searchFilm: true});
-    }else{
-      res.render("infoTemplate", {error: error})
-    }
+    res.json({results: films})
+  }catch{
+    res.status(502).json({error: "Bad Gateway"})
   }
+}
 
 export const delFilmById = async (req:Request, res:Response)=>{
     let filmId = parseInt(req.params.id);
@@ -84,18 +80,15 @@ export const delFilmById = async (req:Request, res:Response)=>{
             .execute();
           await updateFilmCharactersStatus(film.id,false)
           let films = await filmsRepository.find()
-          res.render("infoTemplate", {results: films});
+          res.json({results: films, message: `Los personajes de la película ${film.title} se eliminaron correctamente.`});
         }catch{
-          saveError(503, "El servidor no está listo para manejar la petición.")
-          res.render("infoTemplate", {error: error});
+          res.status(503).json({error: "El servidor no está listo para manejar la petición."})
         }
       }else{
-        saveError(404, `La película ${req.params.id} a eliminar no se encuentra.`);
-        res.render("infoTemplate", {error: error});
+        res.status(404).json({error: `La película con id ${req.params.id} para eliminar, no se encuentra.`})
       }
     }else{
-      saveError(400, `La solicitud "${req.params.id}" es incorrecta.`)
-      res.render("infoTemplate",{error: error})
+      res.status(400).json({error: `La solicitud "${req.params.id}" es incorrecta.`})
     }
   }
 
@@ -116,9 +109,8 @@ export const delFilmsAll = async(req:Request,res:Response) =>{
           .createQueryBuilder()
           .delete()
           .execute();
-      res.render("homeTemplate");
+      res.json({message:"Las películas se eliminaron correctamente!"})
     }catch{
-      saveError(503, "El servidor no está listo para manejar la petición.")
-      res.render("infoTemplate", {error: error});
+      res.status(503).json({error:"El servidor no está listo para manejar la petición."})
     }
   }

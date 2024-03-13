@@ -7,46 +7,28 @@ const AXIOS = require("axios")
 var chekingFilms:boolean = false; //Bandera para que no se repita el rellenado de las películas
 var chekingPeopleForThisFilms:number[] = []; //Bandera para que no se repita el rellenado de los personajes en una película
 
-export var error = {
-  code: 0,
-  info: ""
-}
-
-export function saveError(errorCode:number, errorInfo:string){
-  //Dado que htmx no renderiza cuando hay codigos de estados distintos a 200, pasamos los errores por contexto.
-  //
-  error.code = errorCode
-  error.info = errorInfo;
-};
-
 export async function refillFilmsInDB(res:Response){
   //Busca las películas en la API externa y las guarda en la DB
   if(!chekingFilms){
     chekingFilms = true;
-    try{
-      let filmsAPI = await AXIOS.get("https://swapi.info/api/films");
-      let filmRepository = await AppDataSource.getRepository(Films)
-      for(let i = 0; i < filmsAPI.data.length; i++){
-        let filmAPI = filmsAPI.data[i]
-        let episode_id = await filmRepository.findOneBy({episode_id: filmAPI.episode_id})
-        if(!episode_id){
-          let film = new Films()
-          let filmUrlSplited = (filmAPI.url).split("/")
-          let id = filmUrlSplited[filmUrlSplited.length - 1]
-          film.id = id
-          film.title = filmAPI.title
-          film.episode_id = filmAPI.episode_id
-          await updateFilmCharactersStatus(id,false)
-          await AppDataSource.manager.save(film)
-          console.log(`Película ${film.title} guardada!`)
-        }
+    let filmsAPI = await AXIOS.get("https://swapi.info/api/films");
+    let filmRepository = await AppDataSource.getRepository(Films)
+    for(let i = 0; i < filmsAPI.data.length; i++){
+      let filmAPI = filmsAPI.data[i]
+      let episode_id = await filmRepository.findOneBy({episode_id: filmAPI.episode_id})
+      if(!episode_id){
+        let film = new Films()
+        let filmUrlSplited = (filmAPI.url).split("/")
+        let id = filmUrlSplited[filmUrlSplited.length - 1]
+        film.id = id
+        film.title = filmAPI.title
+        film.episode_id = filmAPI.episode_id
+        await updateFilmCharactersStatus(id,false)
+        await AppDataSource.manager.save(film)
+        console.log(`Película ${film.title} guardada!`)
       }
-    }catch(err){
-      saveError(502,'Bad Gateway.')
-      console.error(err)
-    }finally{
-      chekingFilms = false
     }
+    chekingFilms = false
   }
 }
 
@@ -84,7 +66,7 @@ export async function refillPeopleForThisFilm(res:Response, id:number) {
           await updateFilmCharactersStatus(id,true)
         }
       }catch(err){
-        saveError(502,'Bad Gateway.');
+        console.error(err)
         await updateFilmCharactersStatus(id,false)
       }finally{
         chekingPeopleForThisFilms = chekingPeopleForThisFilms.filter(item => item !== id);
@@ -111,7 +93,7 @@ export async function getPeopleIdFromDbWhitFilmId(id:number):Promise<number[]>{
     let peopleIds = peopleInFilms.map(obj => obj.people_id);
     return peopleIds
   }catch(err){
-    saveError(400, 'Ha ocurrido un error al intentar obtener los ID de los personajes');
+    console.error(err)
     return []
   }
 }
