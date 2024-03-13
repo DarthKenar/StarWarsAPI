@@ -62,27 +62,32 @@ export const delFilmById = async (req:Request, res:Response)=>{
     if(!isNaN(filmId)){
       let filmsRepository = await AppDataSource.getRepository(Films)
       let film = await filmsRepository.findOneBy({id: filmId})
+      
       if(film){
-        try{
-          let charactersIdsToDelete = await getPeopleIdFromDbWhitFilmId(film.id);
-          let peopleRepository = await AppDataSource.getRepository(People)
-          await peopleRepository.createQueryBuilder()
-            .delete()
-            .from(People)
-            .where("id IN (:...charactersIdsToDelete)", { charactersIdsToDelete })
-            .execute();
-          let filmId = [film.id]
-          let peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
-          await peopleInFilmsRepository.createQueryBuilder()
-            .delete()
-            .from(PeopleInFilms)
-            .where("film_id IN (:...filmId)", { filmId })
-            .execute();
-          await updateFilmCharactersStatus(film.id,false)
-          let films = await filmsRepository.find()
-          res.json({results: films, message: `Los personajes de la película ${film.title} se eliminaron correctamente.`});
-        }catch{
-          res.status(503).json({error: "El servidor no está listo para manejar la petición."})
+        let charactersIdsToDelete = await getPeopleIdFromDbWhitFilmId(film.id);
+        if(charactersIdsToDelete.length > 0){
+          try{
+            let peopleRepository = await AppDataSource.getRepository(People)
+            await peopleRepository.createQueryBuilder()
+              .delete()
+              .from(People)
+              .where("id IN (:...charactersIdsToDelete)", { charactersIdsToDelete })
+              .execute();
+            let filmId = [film.id]
+            let peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
+            await peopleInFilmsRepository.createQueryBuilder()
+              .delete()
+              .from(PeopleInFilms)
+              .where("film_id IN (:...filmId)", { filmId })
+              .execute();
+            await updateFilmCharactersStatus(film.id,false)
+            let films = await filmsRepository.find()
+            res.json({results: films, message: `Los personajes de la película ${film.title} se eliminaron correctamente.`});
+          }catch{
+            res.status(503).json({error: "El servidor no está listo para manejar la petición."})
+          }
+        }else{
+          res.status(404).json({error: `La película con ${film.title}, no tiene personajes asociados para eliminar.`})
         }
       }else{
         res.status(404).json({error: `La película con id ${req.params.id} para eliminar, no se encuentra.`})

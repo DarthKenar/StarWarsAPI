@@ -16,7 +16,7 @@ app.use('/film', routerFilm);
 //...
 
 app.get("/",(req:Request, res:Response)=>{
-    res.status(404).json({message:"Hola a todos"})
+    res.json({message:"Bienvenido a SWAPI"})
 })
 
 //Middleware 404
