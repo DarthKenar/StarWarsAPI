@@ -26,25 +26,23 @@ Compilamos Javascript:
 npx tsc
 ```
 
-Ejecutamos el servidor:
+### Ejecutamos los tests
 
 ```Bash
-node ./dist/build/server.js
+npm run test
 ```
-
-Documentacion local:
-
-http://localhost:8000/api-docs
 
 ---
 
-### Servidor local:
+### Ejecutamos el servidor:
 
 ```Bash
 npm run dev
 ```
 
-http://localhost:8000/
+Documentacion local:
+
+http://localhost:3000/api-docs
 
 ---
 
@@ -57,14 +55,14 @@ http://localhost:8000/
 
 | Host | Method | RoutePath | Action |
 |--|--|--|--|
-| localhost:8000 | GET  |`"/"`| Muestra el Home |
-| localhost:8000 | GET  |`"/film/s/all"`| Muestra todas las películas  |
-| localhost:8000 | GET  |`"/film/:id"`| Muestra una película |
-| localhost:8000 | GET  |`"/film/s/search"`| Muestra una lista de películas por nombre |
-| localhost:8000 | DELETE  |`"/film/del/:id"`| Borra una película y sus personajes asociados. |
-| localhost:8000 | DELETE  |`"/film/s/del/all"`| Borra todas las películas y todos los personajes asociados |
+| localhost:3000 | GET  |`"/"`| Muestra el Home |
+| localhost:3000 | GET  |`"/film/s/all"`| Muestra todas las películas  |
+| localhost:3000 | GET  |`"/film/:id"`| Muestra una película |
+| localhost:3000 | GET  |`"/film/s/search"`| Muestra una lista de películas por nombre |
+| localhost:3000 | DELETE  |`"/film/del/:id"`| Borra una película y sus personajes asociados. |
+| localhost:3000 | DELETE  |`"/film/s/del/all"`| Borra todas las películas y todos los personajes asociados |
 |--|--|--|--|
-| localhost:8000 | GET  |`"/api-docs"` | Muestra la documentación |
+| localhost:3000 | GET  |`"/api-docs"` | Muestra la documentación |
 
 # Project Structure
 
