@@ -4,7 +4,7 @@
   "description": "Desarrollo de API StarWars para prueba técnica en Cairox",
   "main": "index.js",
   "scripts": {
-    "test": "jest --verbose --detectOpenHandles --silent",
+    "test": "jest --verbose --silent",
     "test:watch": "npm run test -- --watch",
     "dev": "nodemon dist/build/index.js",
     "start": "node dist/build/index.js",
