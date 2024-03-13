@@ -5,7 +5,6 @@ import { Request, Response } from 'express';
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('../../src/docs/swagger.json');
 const app = express()
-const PATH = require("path")
 
 //https://editor.swagger.io/
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
