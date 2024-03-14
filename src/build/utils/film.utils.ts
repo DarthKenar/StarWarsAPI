@@ -1,4 +1,4 @@
-import { AppDataSource } from "../../database/data-source";
+import DataBase from "../../database/data-source";
 import { Films, People, PeopleInFilms} from "../../database/entity/models";
 import { Response } from 'express';
 
@@ -12,7 +12,7 @@ export async function refillFilmsInDB(res:Response){
   if(!chekingFilms){
     chekingFilms = true;
     let filmsAPI = await AXIOS.get("https://swapi.info/api/films");
-    let filmRepository = await AppDataSource.getRepository(Films)
+    let filmRepository = await DataBase.getRepository(Films)
     for(let i = 0; i < filmsAPI.data.length; i++){
       let filmAPI = filmsAPI.data[i]
       let episode_id = await filmRepository.findOneBy({episode_id: filmAPI.episode_id})
@@ -24,7 +24,7 @@ export async function refillFilmsInDB(res:Response){
         film.title = filmAPI.title
         film.episode_id = filmAPI.episode_id
         await updateFilmCharactersStatus(id,false)
-        await AppDataSource.manager.save(film)
+        await DataBase.manager.save(film)
         console.log(`Película ${film.title} guardada!`)
       }
     }
@@ -43,7 +43,7 @@ export async function refillPeopleForThisFilm(res:Response, id:number) {
         let characters = filmAPI.data.characters
         for(let i = 0; i < characters.length; i++){
           let characterAPI = await AXIOS.get(characters[i]);
-          let peopleRepository = await AppDataSource.getRepository(People)
+          let peopleRepository = await DataBase.getRepository(People)
           let characterInDB = await peopleRepository.findOneBy({name: characterAPI.data.name})
           let characterUrlSplited = characters[i].split('/')
           let characterIdFromApi:number = Number(characterUrlSplited[characterUrlSplited.length - 1])
@@ -58,11 +58,11 @@ export async function refillPeopleForThisFilm(res:Response, id:number) {
             people.gender = characterAPI.data.gender
             let species = await getSpecieFromThisUrl(res, characterAPI.data.species[0])
             people.species = species
-            AppDataSource.manager.save(people)
+            DataBase.manager.save(people)
             console.log(`Personaje ${people.name} guardado!`)
             peopleInFilms.people_id = people.id
           }
-          await AppDataSource.manager.save(peopleInFilms)
+          await DataBase.manager.save(peopleInFilms)
           await updateFilmCharactersStatus(id,true)
         }
       }catch(err){
@@ -77,7 +77,7 @@ export async function refillPeopleForThisFilm(res:Response, id:number) {
 
 export async function updateFilmCharactersStatus(id:number, status:boolean) {
   //Actualiza el estado de film.characters (que determina si tiene o no los personajes asociados guardados en la DB.)
-    let filmsRepository = await AppDataSource.getRepository(Films)
+    let filmsRepository = await DataBase.getRepository(Films)
     let film = await filmsRepository.findOneBy({id: id});
     if(film){
       film.characters = status;
@@ -88,7 +88,7 @@ export async function updateFilmCharactersStatus(id:number, status:boolean) {
 export async function getPeopleIdFromDbWhitFilmId(id:number):Promise<number[]>{
   //Devuelve una lista de los ID de los personajes asociados al ID de una película.
   try{
-    let peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
+    let peopleInFilmsRepository = await DataBase.getRepository(PeopleInFilms)
     let peopleInFilms = await peopleInFilmsRepository.findBy({film_id: id})
     let peopleIds = peopleInFilms.map(obj => obj.people_id);
     return peopleIds

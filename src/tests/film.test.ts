@@ -1,7 +1,9 @@
 import app from "../build/app";
 import supertest from "supertest";
-import { AppDataSource } from "../database/data-source";
+import DataBase from "../database/data-source";
 import server from "../build/index"
+import { createFilm, createPeople, createPeopleInFilms } from "./helpers";
+
 const request = supertest(app)
 
 
@@ -43,8 +45,15 @@ describe("Peticiones GET para routes Film", () => {
   })
 })
 
+describe("Peticiones GET para routes Film",()=>{
+  test("delFilmById - Comprueba que devuelva un error en el que no coincide ninguna película con el título buscado", async () => {
+    let response = await request.get('/film/s/search').query({ searchFilm: 'qwerty'}).expect(404)
+    expect(response.body).toHaveProperty("error")
+  })
+})
+
 
 afterAll(async () => {
-  await AppDataSource.destroy();
+  await DataBase.destroy();
   server.close()
 });
