@@ -4,9 +4,6 @@ import { AppDataSource } from "../database/data-source";
 import server from "../build/index"
 const request = supertest(app)
 
-beforeAll(async () => {
-  await AppDataSource.initialize();
-});
 
 describe("GET a la raiz", () => {
     test("/", async ()=>{
