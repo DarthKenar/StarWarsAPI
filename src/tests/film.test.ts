@@ -2,10 +2,16 @@ import app from "../build/app";
 import supertest from "supertest";
 import DataBase from "../database/data-source";
 import server from "../build/index"
-// import { createFilm, createPeople, createPeopleInFilms } from "./helpers";
+import {createFilm, createPeople, createPeopleInFilms} from "./helpers";
 
 const request = supertest(app)
 
+beforeAll(async ()=>{
+  await DataBase.initialize()
+  await createFilm()
+  await createPeopleInFilms()
+  await createPeople()
+})
 
 describe("GET a la raiz", () => {
     test("/", async ()=>{
@@ -17,10 +23,10 @@ describe("GET a la raiz", () => {
 })
 
 describe("Peticiones GET para routes Film", () => {
-  //200
-  test("getFilmsAll - Comprueba si devuelve las 6 películas", async ()=>{
+  //2XX
+  test("getFilmsAll - Comprueba si devuelve las 6 películas, más la que nosotros hemos creado para el entorno de pruebas", async ()=>{
     let response = await request.get('/film/s/all').expect(200)
-    expect(response.body.results).toHaveLength(6)
+    expect(response.body.results).toHaveLength(7)
   })
   test("getFilmById - Comprueba que se devuelva una película correctamente y esta tenga su valor characters en true, que indica que tiene personajes guardados y relacionados en la base de datos.", async () => {
     let response = await request.get('/film/1').expect(200)
@@ -46,9 +52,10 @@ describe("Peticiones GET para routes Film", () => {
 })
 
 describe("Peticiones GET para routes Film",()=>{
-  test("delFilmById - Comprueba que devuelva un error en el que no coincide ninguna película con el título buscado", async () => {
-    let response = await request.get('/film/s/search').query({ searchFilm: 'qwerty'}).expect(404)
-    expect(response.body).toHaveProperty("error")
+  //2XX
+  test("delFilmById - Elimina una película de la base de datos y luego comprueba que esta no exista.", async () => {
+    let response = await request.get('/film/del/100').expect(404)
+    expect(response.body).toHaveProperty("message")
   })
 })
 

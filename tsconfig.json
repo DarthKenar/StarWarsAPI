@@ -112,6 +112,7 @@
     "src/build/routes/*.ts",
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "./src/tests/helpers.ts"
   ]
 }
