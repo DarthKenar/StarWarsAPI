@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { AppDataSource } from "../../database/data-source";
+import DataBase from "../../database/data-source";
 import { Films, People, PeopleInFilms} from "../../database/entity/models";
 import { refillFilmsInDB, refillPeopleForThisFilm,updateFilmCharactersStatus, getPeopleIdFromDbWhitFilmId} from "../utils/film.utils"
 
@@ -7,13 +7,13 @@ export const getFilmById = async (req:Request, res:Response)=>{
     let filmId:number = parseInt(req.params.id)
     if(!isNaN(filmId)){
       await refillPeopleForThisFilm(res,filmId)
-      let filmsRepository = await AppDataSource.getRepository(Films)
+      let filmsRepository = await DataBase.getRepository(Films)
       let film = await filmsRepository.findOneBy({id: filmId})
       if (film === null) {
         res.status(404).json({error: `No se encontró la película ${req.params.id}.`})
       }else{
         let peopleIds = await getPeopleIdFromDbWhitFilmId(film.id)
-        let peopleRepository = await AppDataSource.getRepository(People)
+        let peopleRepository = await DataBase.getRepository(People)
         let characters = await peopleRepository 
           .createQueryBuilder("film")
           .where("id IN (:...ids)", { ids: peopleIds })
@@ -34,7 +34,7 @@ export const getFilmsByName = async (req:Request, res:Response) => {
     let someFilms:string = String(req.query.searchFilm);
     //https://www.tutorialspoint.com/typeorm/typeorm_query_builder.htm
     //https://typeorm.io/#using-querybuilder
-    let filmsRepository = await AppDataSource.getRepository(Films)
+    let filmsRepository = await DataBase.getRepository(Films)
     let films = await filmsRepository
       .createQueryBuilder("film")
       .where("LOWER(film.title) LIKE LOWER(:title)", { title: `%${someFilms}%` })
@@ -49,7 +49,7 @@ export const getFilmsByName = async (req:Request, res:Response) => {
 export const getFilmsAll = async (req:Request, res:Response) => {
   try{
     await refillFilmsInDB(res)
-    let filmsRepository = await AppDataSource.getRepository(Films)
+    let filmsRepository = await DataBase.getRepository(Films)
     let films = await filmsRepository.find()
     res.json({results: films})
   }catch{
@@ -60,21 +60,21 @@ export const getFilmsAll = async (req:Request, res:Response) => {
 export const delFilmById = async (req:Request, res:Response)=>{
     let filmId = parseInt(req.params.id);
     if(!isNaN(filmId)){
-      let filmsRepository = await AppDataSource.getRepository(Films)
+      let filmsRepository = await DataBase.getRepository(Films)
       let film = await filmsRepository.findOneBy({id: filmId})
       
       if(film){
         let charactersIdsToDelete = await getPeopleIdFromDbWhitFilmId(film.id);
         if(charactersIdsToDelete.length > 0){
           try{
-            let peopleRepository = await AppDataSource.getRepository(People)
+            let peopleRepository = await DataBase.getRepository(People)
             await peopleRepository.createQueryBuilder()
               .delete()
               .from(People)
               .where("id IN (:...charactersIdsToDelete)", { charactersIdsToDelete })
               .execute();
             let filmId = [film.id]
-            let peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
+            let peopleInFilmsRepository = await DataBase.getRepository(PeopleInFilms)
             await peopleInFilmsRepository.createQueryBuilder()
               .delete()
               .from(PeopleInFilms)
@@ -99,9 +99,9 @@ export const delFilmById = async (req:Request, res:Response)=>{
 
 export const delFilmsAll = async(req:Request,res:Response) =>{
     try{
-      var filmsRepository = await AppDataSource.getRepository(Films)
-      var peopleRepository = await AppDataSource.getRepository(People)
-      var peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
+      var filmsRepository = await DataBase.getRepository(Films)
+      var peopleRepository = await DataBase.getRepository(People)
+      var peopleInFilmsRepository = await DataBase.getRepository(PeopleInFilms)
       await filmsRepository
         .createQueryBuilder()
         .delete()

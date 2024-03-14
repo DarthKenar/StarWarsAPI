@@ -1,11 +1,34 @@
 import app from "../build/app";
 import supertest from "supertest";
-import { AppDataSource } from "../database/data-source";
+import DataBase from "../database/data-source";
 import server from "../build/index"
+// import { Films, People, PeopleInFilms } from "../database/entity/models";
 const request = supertest(app)
 
+// beforeEach(async ()=>{
+//   let filmsRepository = await AppDataSource.getRepository(Films)
+//   let film = new Films
+//   film.id = 100
+//   film.title = "titulo de testing"
+//   film.characters = true
+//   film.episode_id = 100
+//   let peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
+//   let peopleInFilms = new PeopleInFilms
+//   peopleInFilms.film_id = 100
+//   peopleInFilms.people_id = 100
+//   let peopleRepository = await AppDataSource.getRepository(People) 
+//   let people = new People
+//   people.id = 100
+//   people.name = "Federico"
+//   people.gender = "male"
+//   people.species = "human"
+//   filmsRepository.save(film)
+//   peopleInFilmsRepository.save(peopleInFilms)
+//   peopleRepository.save(people)
+// })
+
 beforeAll(async () => {
-  await AppDataSource.initialize();
+  await DataBase.initialize();
 });
 
 describe("GET a la raiz", () => {
@@ -48,6 +71,6 @@ describe("Peticiones GET para routes Film", () => {
 
 
 afterAll(async () => {
-  await AppDataSource.destroy();
+  await DataBase.destroy();
   server.close()
 });
