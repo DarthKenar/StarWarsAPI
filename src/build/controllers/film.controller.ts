@@ -100,21 +100,29 @@ export const delFilmById = async (req:Request, res:Response)=>{
 export const delFilmsAll = async(req:Request,res:Response) =>{
     try{
       var filmsRepository = await DataBase.getRepository(Films)
-      var peopleRepository = await DataBase.getRepository(People)
       var peopleInFilmsRepository = await DataBase.getRepository(PeopleInFilms)
-      await filmsRepository
-        .createQueryBuilder()
-        .delete()
-        .execute();
-      await peopleRepository
+      var peopleRepository = await DataBase.getRepository(People)
+      let films = await filmsRepository.find()
+      let peopleInFilms = await peopleInFilmsRepository.find()
+      let people = await peopleRepository.find()
+      console.log(films.length === 0 && peopleInFilms.length === 0 && people.length === 0)
+      if(films.length === 0 && peopleInFilms.length === 0 && people.length === 0){
+        res.status(404).json({error:"La base de datos no tiene películas para eliminar."})
+      }else{
+        await filmsRepository
           .createQueryBuilder()
           .delete()
           .execute();
-      await peopleInFilmsRepository
-          .createQueryBuilder()
-          .delete()
-          .execute();
-      res.json({message:"Las películas se eliminaron correctamente!"})
+        await peopleRepository
+            .createQueryBuilder()
+            .delete()
+            .execute();
+        await peopleInFilmsRepository
+            .createQueryBuilder()
+            .delete()
+            .execute();
+        res.json({message:"Las películas se eliminaron correctamente!"})
+      }
     }catch{
       res.status(503).json({error:"El servidor no está listo para manejar la petición."})
     }
