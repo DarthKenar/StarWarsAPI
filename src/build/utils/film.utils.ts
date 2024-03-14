@@ -4,13 +4,13 @@ import { Response } from 'express';
 
 const AXIOS = require("axios")
 
-var chekingFilms:boolean = false; //Bandera para que no se repita el rellenado de las películas
-var chekingPeopleForThisFilms:number[] = []; //Bandera para que no se repita el rellenado de los personajes en una película
+var checkingFilms:boolean = false; //Bandera para que no se repita el rellenado de las películas
+var checkingPeopleForThisFilms:number[] = []; //Bandera para que no se repita el rellenado de los personajes en una película
 
 export async function refillFilmsInDB(res:Response){
   //Busca las películas en la API externa y las guarda en la DB
-  if(!chekingFilms){
-    chekingFilms = true;
+  if(!checkingFilms){
+    checkingFilms = true;
     let filmsAPI = await AXIOS.get("https://swapi.info/api/films");
     let filmRepository = await DataBase.getRepository(Films)
     for(let i = 0; i < filmsAPI.data.length; i++){
@@ -18,8 +18,8 @@ export async function refillFilmsInDB(res:Response){
       let episode_id = await filmRepository.findOneBy({episode_id: filmAPI.episode_id})
       if(!episode_id){
         let film = new Films()
-        let filmUrlSplited = (filmAPI.url).split("/")
-        let id = filmUrlSplited[filmUrlSplited.length - 1]
+        let filmUrlSplitted = (filmAPI.url).split("/")
+        let id = filmUrlSplitted[filmUrlSplitted.length - 1]
         film.id = id
         film.title = filmAPI.title
         film.episode_id = filmAPI.episode_id
@@ -28,7 +28,7 @@ export async function refillFilmsInDB(res:Response){
         console.log(`Película ${film.title} guardada!`)
       }
     }
-    chekingFilms = false
+    checkingFilms = false
   }
 }
 
@@ -36,8 +36,8 @@ export async function refillPeopleForThisFilm(res:Response, id:number) {
   //Busca los personajes asociados con la película en la API externa y los guarda en la DB
   let characters = await getPeopleIdFromDbWhitFilmId(id)
   if(characters.length === 0){
-    if(!chekingPeopleForThisFilms.includes(id)){
-      chekingPeopleForThisFilms.push(id)
+    if(!checkingPeopleForThisFilms.includes(id)){
+      checkingPeopleForThisFilms.push(id)
       try{
         let filmAPI = await AXIOS.get(`https://swapi.info/api/films/${id}/`);
         let characters = filmAPI.data.characters
@@ -45,8 +45,8 @@ export async function refillPeopleForThisFilm(res:Response, id:number) {
           let characterAPI = await AXIOS.get(characters[i]);
           let peopleRepository = await DataBase.getRepository(People)
           let characterInDB = await peopleRepository.findOneBy({name: characterAPI.data.name})
-          let characterUrlSplited = characters[i].split('/')
-          let characterIdFromApi:number = Number(characterUrlSplited[characterUrlSplited.length - 1])
+          let characterUrlSplitted = characters[i].split('/')
+          let characterIdFromApi:number = Number(characterUrlSplitted[characterUrlSplitted.length - 1])
           let peopleInFilms = new PeopleInFilms()
           peopleInFilms.film_id = id
           if(characterInDB){
@@ -69,7 +69,7 @@ export async function refillPeopleForThisFilm(res:Response, id:number) {
         console.error(err)
         await updateFilmCharactersStatus(id,false)
       }finally{
-        chekingPeopleForThisFilms = chekingPeopleForThisFilms.filter(item => item !== id);
+        checkingPeopleForThisFilms = checkingPeopleForThisFilms.filter(item => item !== id);
       }
     }
   }
