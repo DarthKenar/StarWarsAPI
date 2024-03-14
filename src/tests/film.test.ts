@@ -2,30 +2,15 @@ import app from "../build/app";
 import supertest from "supertest";
 import DataBase from "../database/data-source";
 import server from "../build/index"
-// import { Films, People, PeopleInFilms } from "../database/entity/models";
+import { createFilm, createPeople, createPeopleInFilms } from "./helpers";
+
 const request = supertest(app)
 
-// beforeEach(async ()=>{
-//   let filmsRepository = await DataBase.getRepository(Films)
-//   let film = new Films
-//   film.id = 100
-//   film.title = "titulo de testing"
-//   film.characters = true
-//   film.episode_id = 100
-//   let peopleInFilmsRepository = await DataBase.getRepository(PeopleInFilms)
-//   let peopleInFilms = new PeopleInFilms
-//   peopleInFilms.film_id = 100
-//   peopleInFilms.people_id = 100
-//   let peopleRepository = await DataBase.getRepository(People) 
-//   let people = new People
-//   people.id = 100
-//   people.name = "Federico"
-//   people.gender = "male"
-//   people.species = "human"
-//   filmsRepository.save(film)
-//   peopleInFilmsRepository.save(peopleInFilms)
-//   peopleRepository.save(people)
-// })
+beforeEach(async ()=>{
+  await createFilm()
+  await createPeopleInFilms()
+  await createPeople()
+})
 
 describe("GET a la raiz", () => {
     test("/", async ()=>{
@@ -59,6 +44,13 @@ describe("Peticiones GET para routes Film", () => {
     let response = await request.get('/film/7').expect(404)
     expect(response.body).toHaveProperty("error")
   })
+  test("getFilmsByName - Comprueba que devuelva un error en el que no coincide ninguna película con el título buscado", async () => {
+    let response = await request.get('/film/s/search').query({ searchFilm: 'qwerty'}).expect(404)
+    expect(response.body).toHaveProperty("error")
+  })
+})
+
+describe("Peticiones GET para routes Film",()=>{
   test("getFilmsByName - Comprueba que devuelva un error en el que no coincide ninguna película con el título buscado", async () => {
     let response = await request.get('/film/s/search').query({ searchFilm: 'qwerty'}).expect(404)
     expect(response.body).toHaveProperty("error")
