@@ -23,7 +23,7 @@ describe("GET a la raiz", () => {
 
 describe("Peticiones GET para routes Film", () => {
   //200
-  test("delFilmsAll - Comprueba si devuelve las 6 películas", async ()=>{
+  test("getFilmsAll - Comprueba si devuelve las 6 películas", async ()=>{
     let response = await request.get('/film/s/all').expect(200)
     expect(response.body.results).toHaveLength(6)
   })
@@ -51,7 +51,7 @@ describe("Peticiones GET para routes Film", () => {
 })
 
 describe("Peticiones GET para routes Film",()=>{
-  test("getFilmsByName - Comprueba que devuelva un error en el que no coincide ninguna película con el título buscado", async () => {
+  test("delFilmById - Comprueba que devuelva un error en el que no coincide ninguna película con el título buscado", async () => {
     let response = await request.get('/film/s/search').query({ searchFilm: 'qwerty'}).expect(404)
     expect(response.body).toHaveProperty("error")
   })
