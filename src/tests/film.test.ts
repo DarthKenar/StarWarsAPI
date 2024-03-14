@@ -2,7 +2,7 @@ import app from "../build/app";
 import supertest from "supertest";
 import DataBase from "../database/data-source";
 import server from "../build/index"
-import { createFilm, createPeople, createPeopleInFilms } from "./helpers";
+// import { createFilm, createPeople, createPeopleInFilms } from "./helpers";
 
 const request = supertest(app)
 
