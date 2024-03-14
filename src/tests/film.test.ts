@@ -6,17 +6,17 @@ import server from "../build/index"
 const request = supertest(app)
 
 // beforeEach(async ()=>{
-//   let filmsRepository = await AppDataSource.getRepository(Films)
+//   let filmsRepository = await DataBase.getRepository(Films)
 //   let film = new Films
 //   film.id = 100
 //   film.title = "titulo de testing"
 //   film.characters = true
 //   film.episode_id = 100
-//   let peopleInFilmsRepository = await AppDataSource.getRepository(PeopleInFilms)
+//   let peopleInFilmsRepository = await DataBase.getRepository(PeopleInFilms)
 //   let peopleInFilms = new PeopleInFilms
 //   peopleInFilms.film_id = 100
 //   peopleInFilms.people_id = 100
-//   let peopleRepository = await AppDataSource.getRepository(People) 
+//   let peopleRepository = await DataBase.getRepository(People) 
 //   let people = new People
 //   people.id = 100
 //   people.name = "Federico"
@@ -26,10 +26,6 @@ const request = supertest(app)
 //   peopleInFilmsRepository.save(peopleInFilms)
 //   peopleRepository.save(people)
 // })
-
-beforeAll(async () => {
-  await DataBase.initialize();
-});
 
 describe("GET a la raiz", () => {
     test("/", async ()=>{
