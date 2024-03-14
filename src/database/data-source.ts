@@ -8,7 +8,7 @@ function getDataSource(): DataSource {
     switch (process.env.NODE_ENV) {
         case "production":
             console.log("Base de datos establecida para el entorno de produccion")
-            return new DataSource({
+            let dataProd = new DataSource({
                 type: "sqlite",
                 database: PATH.join(__dirname, "../database/productiondatabase.sqlite"),
                 synchronize: false,
@@ -17,9 +17,11 @@ function getDataSource(): DataSource {
                 migrations: [],
                 subscribers: [], 
             });
+            dataProd.initialize()
+            return dataProd
         case "dev":
             console.log("Base de datos establecida para el entorno de desarrollo")
-            return new DataSource({
+            let dataDev = new DataSource({
                 type: "sqlite",
                 database: PATH.join(__dirname, "../database/devdatabase.sqlite"),
                 synchronize: true,
@@ -28,9 +30,11 @@ function getDataSource(): DataSource {
                 migrations: [],
                 subscribers: [], 
             });
+            dataDev.initialize()
+            return dataDev
         case "test":
             console.log("Base de datos establecida para el entorno de testing")
-            return new DataSource({
+            let dataTest = new DataSource({
                 type: "sqlite",
                 database: PATH.join(__dirname, "../database/testdatabase.sqlite"),
                 synchronize: true,
@@ -39,6 +43,7 @@ function getDataSource(): DataSource {
                 migrations: [],
                 subscribers: [], 
             });
+            return dataTest
         default:
             throw new Error("La base de datos no se exportará, no hay un entorno de desarrollo establecido.");
     }
