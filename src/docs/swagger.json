@@ -149,32 +149,6 @@
         }
       }
     },
-    "/film/s/del/all": {
-      "delete": {
-        "tags": [
-          "FILM"
-        ],
-        "summary": "Elimina todas las películas",
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Films"
-                  }
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "El servidor no está listo para manejar la petición."
-          }
-        }
-      }
-    },
     "/film/del/{film.id}": {
       "delete": {
         "tags": [
@@ -216,6 +190,32 @@
           },
           "404": {
             "description": "La película a eliminar no se encuentra."
+          },
+          "503": {
+            "description": "El servidor no está listo para manejar la petición."
+          }
+        }
+      }
+    },
+    "/film/s/del/all": {
+      "delete": {
+        "tags": [
+          "FILM"
+        ],
+        "summary": "Elimina todas las películas",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Films"
+                  }
+                }
+              }
+            }
           },
           "503": {
             "description": "El servidor no está listo para manejar la petición."
