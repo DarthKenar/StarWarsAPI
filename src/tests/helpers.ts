@@ -1,4 +1,5 @@
 import { Films, People, PeopleInFilms } from "../database/entity/models";
+import DataBase from "../database/data-source";
 
 export async function createFilm(){
     let filmsRepository = await DataBase.getRepository(Films)
