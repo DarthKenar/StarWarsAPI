@@ -55,12 +55,12 @@ http://localhost:3000/api-docs
 
 | Host | Method | RoutePath | Action |
 |--|--|--|--|
-| localhost:3000 | GET  |`"/"`| Muestra el Home |
-| localhost:3000 | GET  |`"/film/s/all"`| Muestra todas las películas  |
-| localhost:3000 | GET  |`"/film/:id"`| Muestra una película |
-| localhost:3000 | GET  |`"/film/s/search"`| Muestra una lista de películas por nombre |
+| localhost:3000 | GET  |`"/"`| Muestra el Home. |
+| localhost:3000 | GET  |`"/film/s/all"`| Muestra todas las películas.  |
+| localhost:3000 | GET  |`"/film/:id"`| Muestra una película. |
+| localhost:3000 | GET  |`"/film/s/search"`| Muestra una lista de películas por nombre. |
 | localhost:3000 | DELETE  |`"/film/del/:id"`| Borra los personajes asociados a una película. |
-| localhost:3000 | DELETE  |`"/film/s/del/all"`| Borra todas las películas y todos los personajes asociados |
+| localhost:3000 | DELETE  |`"/film/s/del/all"`| Borra todas las películas y todos los personajes asociados. |
 |--|--|--|--|
 | localhost:3000 | GET  |`"/api-docs"` | Muestra la documentación |
 
