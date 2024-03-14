@@ -10,7 +10,7 @@ function getDataSource(): DataSource {
             console.log("Base de datos establecida para el entorno de produccion")
             return new DataSource({
                 type: "sqlite",
-                database: PATH.join(__dirname, "./dist/database/productiondatabase.sqlite"),
+                database: PATH.join(__dirname, "../database/productiondatabase.sqlite"),
                 synchronize: false,
                 logging: false,
                 entities: [Films,People,PeopleInFilms],
@@ -21,7 +21,7 @@ function getDataSource(): DataSource {
             console.log("Base de datos establecida para el entorno de desarrollo")
             return new DataSource({
                 type: "sqlite",
-                database: PATH.join(__dirname, "./dist/database/devdatabase.sqlite"),
+                database: PATH.join(__dirname, "../database/devdatabase.sqlite"),
                 synchronize: true,
                 logging: false,
                 entities: [Films,People,PeopleInFilms],
