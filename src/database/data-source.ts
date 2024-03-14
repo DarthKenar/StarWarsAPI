@@ -45,5 +45,4 @@ function getDataSource(): DataSource {
 }
 
 const DataBase = getDataSource();
-DataBase.initialize()
 export default DataBase;
