@@ -1,19 +1,19 @@
 import "reflect-metadata"
 import { DataSource } from "typeorm"
-import { People, Films, PeopleInFilms} from "./entity/models"
+import { Auth, People, Films, PeopleInFilms,} from "./entity/models"
 
 const PATH = require("path")
 
 function getDataSource(): DataSource {
     switch (process.env.NODE_ENV) {
         case "production":
-            console.log("Base de datos establecida para el entorno de produccion")
+            console.log("Base de datos establecida para el entorno de producción")
             let dataProd = new DataSource({
                 type: "sqlite",
                 database: PATH.join(__dirname, "../database/productiondatabase.sqlite"),
                 synchronize: false,
                 logging: false,
-                entities: [Films,People,PeopleInFilms],
+                entities: [Auth,Films,People,PeopleInFilms],
                 migrations: [],
                 subscribers: [], 
             });
@@ -26,7 +26,7 @@ function getDataSource(): DataSource {
                 database: PATH.join(__dirname, "../database/devdatabase.sqlite"),
                 synchronize: true,
                 logging: false,
-                entities: [Films,People,PeopleInFilms],
+                entities: [Auth,Films,People,PeopleInFilms],
                 migrations: [],
                 subscribers: [], 
             });
@@ -39,7 +39,7 @@ function getDataSource(): DataSource {
                 database: PATH.join(__dirname, "../database/testdatabase.sqlite"),
                 synchronize: true,
                 logging: false,
-                entities: [Films,People,PeopleInFilms],
+                entities: [Auth,Films,People,PeopleInFilms],
                 migrations: [],
                 subscribers: [], 
             });
