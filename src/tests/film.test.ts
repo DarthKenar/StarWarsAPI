@@ -16,7 +16,7 @@ describe("GET a la raiz", () => {
 
 describe("Peticiones GET para routes Film", () => {
   //200
-  test("delFilmsAll - Comprueba si devuelve las 6 películas", async ()=>{
+  test("getFilmsAll - Comprueba si devuelve las 6 películas", async ()=>{
     let response = await request.get('/film/s/all').expect(200)
     expect(response.body.results).toHaveLength(6)
   })
