@@ -42,7 +42,7 @@
           "FILM"
         ],
         "summary": "Busca todas las películas y las devuelve",
-        "description": "Devuelve todas las películas (Las busca en la API si no estan en la BD)",
+        "description": "Devuelve todas las películas (Las busca en la API si no están en la BD)",
         "responses": {
           "200": {
             "description": "successful operation",
@@ -107,7 +107,7 @@
           "FILM"
         ],
         "summary": "Busca una película por id y devuelve la misma y su lista de personajes.",
-        "description": "Devuelve la película y una lista de los personajes que están en la misma. (Los busca en la API si no estan en la BD)",
+        "description": "Devuelve la película y una lista de los personajes que están en la misma. (Los busca en la API si no están en la BD)",
         "parameters": [
           {
             "name": "film.id",
