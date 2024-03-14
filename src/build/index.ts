@@ -6,8 +6,3 @@ let server = app.listen(PORT);
 
 console.log(`Escuchando en puerto http://localhost:${PORT}...`)
 export default server;
-
-
-
-
-

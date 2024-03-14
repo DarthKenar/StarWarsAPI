@@ -53,9 +53,25 @@ describe("Peticiones GET para routes Film", () => {
 
 describe("Peticiones GET para routes Film",()=>{
   //2XX
-  test("delFilmById - Elimina una película de la base de datos y luego comprueba que esta no exista.", async () => {
+  test("delFilmById - Comprueba que se eliminen los personajes realcionados con una película.", async () => {
     let response = await request.delete('/film/del/100').expect(200)
     expect(response.body).toHaveProperty("message")
+  })
+  //4XX
+  test("delFilmById - Comprueba que deuelva un error al no encontrar una película para eliminar buscando por string", async () => {
+    let response = await request.delete('/film/del/qwerty').expect(400)
+    expect(response.body).toHaveProperty("error")
+    expect(response.body.error).toContain("La solicitud \"qwerty\" es incorrecta.")
+  })
+  test("delFilmById - Comprueba que deuelva un error al no encontrar personajes para una película", async () => {
+    let response = await request.delete('/film/del/2').expect(404)
+    expect(response.body).toHaveProperty("error")
+    expect(response.body.error).toContain("La película The Empire Strikes Back, no tiene personajes asociados para eliminar.")
+  })
+  test("delFilmById - Comprueba que deuelva un error al no encontrar una película", async () => {
+    let response = await request.delete('/film/del/22').expect(404)
+    expect(response.body).toHaveProperty("error")
+    expect(response.body.error).toContain("La película con id 22 para eliminar, no se encuentra.")
   })
 })
 

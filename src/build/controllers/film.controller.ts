@@ -87,7 +87,7 @@ export const delFilmById = async (req:Request, res:Response)=>{
             res.status(503).json({error: "El servidor no está listo para manejar la petición."})
           }
         }else{
-          res.status(404).json({error: `La película con ${film.title}, no tiene personajes asociados para eliminar.`})
+          res.status(404).json({error: `La película ${film.title}, no tiene personajes asociados para eliminar.`})
         }
       }else{
         res.status(404).json({error: `La película con id ${req.params.id} para eliminar, no se encuentra.`})
