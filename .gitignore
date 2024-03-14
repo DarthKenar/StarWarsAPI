@@ -6,3 +6,4 @@ IDEAS.md
 .vscode/
 Desktop.ini
 database.sqlite
+/src/database/testdatabase.sqlite
