@@ -54,7 +54,7 @@ describe("Peticiones GET para routes Film", () => {
 describe("Peticiones GET para routes Film",()=>{
   //2XX
   test("delFilmById - Elimina una película de la base de datos y luego comprueba que esta no exista.", async () => {
-    let response = await request.get('/film/del/100').expect(404)
+    let response = await request.delete('/film/del/100').expect(200)
     expect(response.body).toHaveProperty("message")
   })
 })
