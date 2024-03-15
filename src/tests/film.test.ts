@@ -13,7 +13,7 @@ beforeAll(async ()=>{
   await createPeople()
 })
 
-describe("GET a la raiz", () => {
+describe("GET a la raíz", () => {
     test("/", async ()=>{
       await request
         .get('/')
