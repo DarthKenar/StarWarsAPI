@@ -20,6 +20,8 @@ export const postLogin = async (req:Request, res:Response)=>{
         let AuthRepository = DataBase.getRepository(Auth)
         let userData = await AuthRepository.findOneBy({email: email})
         if(userData){
+            //TODO: 
+            // Hacer comparación con Bcrypt
             let passwordComparison = userData.password === password
             if(passwordComparison){
                 res.json({message:"El usuario ha ingresado correctamente."})
@@ -45,6 +47,10 @@ export const postRegister = async (req:Request, res:Response)=>{
         if(!userData){
             let newUser = new Auth
             newUser.email = email
+            // TODO: 
+            // Bcrypt para encriptar el password 
+            // https://www.npmjs.com/package/bcrypt
+
             newUser.password = password
             AuthRepository.save(newUser)
             // res.redirect("/auth/login")

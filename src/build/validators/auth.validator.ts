@@ -9,9 +9,6 @@ validation: {
 		"mensaje de error 3"
 	]
 }
-Hacer uso de validadores en esta etapa (que devuelvan booleanos para responder con errores en este mismo controller)
-para correo correcto (que devuelva un objeto con un booleano lista de mensajes para responder con errores en este mismo controller) 
-(usar los mismos validadores que en login para comprobar si un correo es correcto por ejemplo)
 
 1/23/2014  Intel Core i7-2700K CPU @ 3.50 GHz
 
@@ -28,8 +25,6 @@ para correo correcto (que devuelva un objeto con un booleano lista de mensajes p
 | 16   | 65,536 iterations |  9,302.2 ms |
 
 */
-
-
 
 export function validators(email:string, password:string){
 	let validation = {
