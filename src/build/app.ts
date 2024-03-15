@@ -12,6 +12,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 //Routers
 const routerFilm = require('./routes/film.routes');
 app.use('/film', routerFilm);
+
+const routerAuth = require('./routes/auth.routes');
+app.use('/auth', routerAuth);
 //...
 
 app.get("/",(req:Request, res:Response)=>{

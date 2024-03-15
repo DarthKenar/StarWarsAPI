@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import {validators} from "../validators/auth.validator"
+import { Auth } from "../../database/entity/models";
+import DataBase from "../../database/data-source";
 
 
 export const getLogin = async (req:Request, res:Response)=>{
@@ -11,29 +13,45 @@ export const getRegister = async (req:Request, res:Response)=>{
 }
 
 export const postLogin = async (req:Request, res:Response)=>{
-
-    //TODO:
-    // capturar información enviada por el usuario
     let email = req.body.email
     let password = req.body.password
     let validation = await validators(email, password)
-    // buscar si existe un usuario con ese correo
-    // ((Si no hay usuario en la BD responder que no existe el usuario con ese correo))
-    // Si hay usuario en la BD con ese correo, comparar la contraseña ingresada con el hash de la BD
-    // ((Si no coincide responder con (la contraseña ingresada es incorrecta)))
-    // Si la contraseña pasa entonces enviar (Sesión de usuario iniciada correctamente)
-
-    res.json({})
+    if(validation.status === true){
+        let AuthRepository = DataBase.getRepository(Auth)
+        let userData = await AuthRepository.findOneBy({email: email})
+        if(userData){
+            let passwordComparison = userData.password === password
+            if(passwordComparison){
+                res.redirect("/")
+            }else{
+                res.status(401).json({message: "La contraseña ingresada no es correcta."})
+            }
+        }else{
+            res.status(401).json({message: "No existe un usuario con ese correo electrónico."})
+        }
+    }else{
+        res.status(401).json({validation: validation})
+    }
 }
 
 export const postRegister = async (req:Request, res:Response)=>{
-
-    //TODO:
-    // Capturar correo y contraseña ingresada por el usuario
-    // Validadores 
-    // buscar ese correo en la BD
-    // ((Si ya existe ese correo entonces responder que ese correo ya existe.))
-    // Si el correo No existe entonces registrar al usuario
-
-    res.json({})
+    let email = req.body.email
+    let password = req.body.password
+    let validation = await validators(email, password)
+    if(validation.status === true){
+        let AuthRepository = DataBase.getRepository(Auth)
+        let userData = await AuthRepository.findOneBy({email: email})
+        if(!userData){
+            //Registrar usuario
+            let newUser = new Auth
+            newUser.email = email
+            newUser.password = password
+            AuthRepository.save(newUser)
+            res.redirect("/auth/login")
+        }else{
+            res.status(403).json({message: "El correo electrónico ingresado ya existe."})
+        }
+    }else{
+        res.status(401).json({validation: validation})
+    }
 }
