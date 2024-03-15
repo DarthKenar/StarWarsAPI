@@ -75,6 +75,12 @@ describe("Peticiones GET para routes Film",()=>{
   })
 })
 
+// TODO: 
+// Test login
+// getLogin
+// getRegister
+// postLogin
+// postRegister
 
 afterAll(async () => {
   await DataBase.destroy();
