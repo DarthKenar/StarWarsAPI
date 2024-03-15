@@ -8,13 +8,13 @@ import {
     postRegister
   } from "../controllers/auth.controller"
 
-routerAuth.get("/login", getLogin)
+routerAuth.get("/login", getLogin) //OK
 
-routerAuth.get("/register", getRegister)
+routerAuth.get("/register", getRegister) //OK
 
 routerAuth.post("/login/send", postLogin)
 
-routerAuth.post("/register/send", postRegister)
+routerAuth.post("/register/send", postRegister) //
 
 
 module.exports = routerAuth;

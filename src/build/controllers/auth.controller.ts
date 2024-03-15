@@ -22,7 +22,8 @@ export const postLogin = async (req:Request, res:Response)=>{
         if(userData){
             let passwordComparison = userData.password === password
             if(passwordComparison){
-                res.redirect("/")
+                res.json({message:"El usuario ha ingresado correctamente."})
+                // res.redirect("/")
             }else{
                 res.status(401).json({message: "La contraseña ingresada no es correcta."})
             }
@@ -42,14 +43,15 @@ export const postRegister = async (req:Request, res:Response)=>{
         let AuthRepository = DataBase.getRepository(Auth)
         let userData = await AuthRepository.findOneBy({email: email})
         if(!userData){
-            //Registrar usuario
             let newUser = new Auth
             newUser.email = email
             newUser.password = password
             AuthRepository.save(newUser)
-            res.redirect("/auth/login")
+            // res.redirect("/auth/login")
+            res.json({message:"El usuario se ha registrado correctamente."})
         }else{
-            res.status(403).json({message: "El correo electrónico ingresado ya existe."})
+            validation.messages.push("El correo electrónico ingresado ya existe.")
+            res.status(403).json(validation)
         }
     }else{
         res.status(401).json({validation: validation})

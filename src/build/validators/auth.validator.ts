@@ -29,17 +29,19 @@ para correo correcto (que devuelva un objeto con un booleano lista de mensajes p
 
 */
 
-let validation = {
-					status: true as Boolean, //false, significa que fallo la comprobación de validación
-					messages: [] as string[]
-				}
+
 
 export function validators(email:string, password:string){
-	console.log(email,password)
-	if(!password.includes("@")){
+	let validation = {
+		status: true as Boolean, //false, significa que fallo la comprobación de validación
+		messages: [] as string[]
+	}
+	if(!email.includes("@")){
+		validation.status = false
 		validation.messages.push("El correo electrónico ingresado no es válido (@).")
 	}
 	if(password.length < 8){
+		validation.status = false
 		validation.messages.push("La contraseña tiene que tener al menos 8 caracteres.")
 	}
 	return validation
