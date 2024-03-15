@@ -24,7 +24,7 @@ export async function refillFilmsInDB(res:Response){
         film.title = filmAPI.title
         film.episode_id = filmAPI.episode_id
         await updateFilmCharactersStatus(id,false)
-        await DataBase.manager.save(film)
+        await filmRepository.save(film)
         console.log(`Película ${film.title} guardada!`)
       }
     }
@@ -58,7 +58,7 @@ export async function refillPeopleForThisFilm(res:Response, id:number) {
             people.gender = characterAPI.data.gender
             let species = await getSpecieFromThisUrl(res, characterAPI.data.species[0])
             people.species = species
-            DataBase.manager.save(people)
+            peopleRepository.save(people)
             console.log(`Personaje ${people.name} guardado!`)
             peopleInFilms.people_id = people.id
           }
