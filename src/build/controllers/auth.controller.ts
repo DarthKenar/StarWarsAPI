@@ -48,6 +48,7 @@ export const postRegister = async (req:Request, res:Response)=>{
             newUser.password = password
             AuthRepository.save(newUser)
             // res.redirect("/auth/login")
+            // TODO: Cuando se utiliza redirect con método post se espera la confirmación del cliente antes de redireccionar (por eso continúa con la ejecución y lectura de rutas coincidentes)
             res.json({message:"El usuario se ha registrado correctamente."})
         }else{
             validation.messages.push("El correo electrónico ingresado ya existe.")
