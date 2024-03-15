@@ -30,7 +30,7 @@ export const getFilmById = async (req:Request, res:Response)=>{
   }
 
 export const getFilmsByName = async (req:Request, res:Response) => {
-    console.log("Parametro buscado:", req.query.searchFilm)
+    console.log("Parámetro buscado:", req.query.searchFilm)
     let someFilms:string = String(req.query.searchFilm);
     //https://www.tutorialspoint.com/typeorm/typeorm_query_builder.htm
     //https://typeorm.io/#using-querybuilder

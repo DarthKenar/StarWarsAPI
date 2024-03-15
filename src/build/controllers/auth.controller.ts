@@ -20,7 +20,7 @@ export const postLogin = async (req:Request, res:Response)=>{
         let AuthRepository = DataBase.getRepository(Auth)
         let userData = await AuthRepository.findOneBy({email: email})
         if(userData){
-            //TODO: 
+            // TODO: 
             // Hacer comparación con Bcrypt
             let passwordComparison = userData.password === password
             if(passwordComparison){
