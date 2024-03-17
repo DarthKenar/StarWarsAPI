@@ -28,10 +28,12 @@ describe("Peticiones GET para routes Film", () => {
     let response = await request.get('/film/s/all').expect(200)
     expect(response.body.results).toHaveLength(7)
   })
+  //WARNING:
+  //Este test, incluye una ruta que establece una conexión con una API externa de la que obtiene datos. Si esta conexión es nula, debería devolver un error distinto fallando la prueba. 
   test("getFilmById - Comprueba que se devuelva una película correctamente y esta tenga su valor characters en true, que indica que tiene personajes guardados y relacionados en la base de datos.", async () => {
     let response = await request.get('/film/1').expect(200)
     expect(response.body.film.characters).toBe(true)
-  })
+  },50000)
   test("getFilmsByName - Comprueba que devuelva una lista con 5 resultados", async () => {
     let response = await request.get('/film/s/search').query({ searchFilm: 'a'}).expect(200)
     expect(response.body.results.length).toBe(5)
@@ -52,15 +54,11 @@ describe("Peticiones GET para routes Film", () => {
 })
 
 describe("Peticiones DELETE para routes Film",()=>{
-  //2XX
   test("delFilmById - Comprueba que se eliminen los personajes relacionados con una película.", async () => {
     let response = await request.delete('/film/del/100').expect(200)
     expect(response.body).toHaveProperty("message")
   })
-
-  //4XX
   test("delFilmById - Comprueba que devuelva un error al no encontrar personajes para una película", async () => {
-    await createFilm(99)
     let response = await request.delete('/film/del/100').expect(404)
     expect(response.body).toHaveProperty("error")
     expect(response.body.error).toContain("La película Titulo de película para testing, no tiene personajes asociados para eliminar.")
@@ -86,7 +84,6 @@ describe("Peticiones DELETE para routes Film",()=>{
     expect(response.body).toHaveProperty("error")
     expect(response.body.error).toContain("La base de datos no tiene películas para eliminar.")
   })
-  
 })
 
 afterAll(async () => {

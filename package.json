@@ -1,10 +1,10 @@
 {
   "name": "starwars",
   "version": "1.0.0",
-  "description": "Desarrollo de API StarWars para prueba técnica en Cairox",
+  "description": "Desarrollo de API StarWars para prueba técnica en Kairox",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=test jest --verbose",
+    "test": "cross-env NODE_ENV=test jest --verbose --silent",
     "test:watch": "npm run test -- --watch",
     "dev": "cross-env NODE_ENV=dev nodemon dist/build/index.js",
     "start": "cross-env NODE_ENV=production node dist/build/index.js",
