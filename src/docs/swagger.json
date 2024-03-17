@@ -19,7 +19,12 @@
   },
   "tags": [
     {
-      "name": "FILM"
+      "name": "FILM",
+      "description": "Películas y personajes de las mismas"
+    },
+    {
+      "name": "AUTH",
+      "description": "Formularios de Autentificación"
     }
   ],
   "paths": {
@@ -28,7 +33,7 @@
         "tags": [
           "FILM"
         ],
-        "description": "Renderiza el index",
+        "description": "Muestra el index",
         "responses": {
           "200": {
             "description": "Successful operation"
@@ -222,10 +227,74 @@
           }
         }
       }
+    },
+    "/auth/login": {
+      "get": {
+        "tags": [
+          "AUTH"
+        ],
+        "summary": "Muestra el formulario de autentificación",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Auth"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "get": {
+        "tags": [
+          "AUTH"
+        ],
+        "summary": "Muestra el formulario de registro",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Auth"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "auth": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 6
+          },
+          "email": {
+            "type": "integer",
+            "example": "federico@gmail.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "$2b$10$zvP6Tx3aZ5d45zEDIYFBUejS4.fJzY830oO/UKiRXd147T8s24hP2"
+          }
+        }
+      },
       "Films": {
         "type": "object",
         "properties": {
