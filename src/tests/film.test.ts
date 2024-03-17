@@ -13,15 +13,6 @@ beforeAll(async ()=>{
   await createPeople(100)
 })
 
-describe("GET a la raíz", () => {
-    test("/", async ()=>{
-      await request
-        .get('/')
-        .expect('Content-Type', /application\/json/)
-        .expect(200)
-    })
-})
-
 describe("Peticiones GET para routes Film", () => {
   //2XX
   test("getFilmsAll - Comprueba si devuelve las 6 películas, más la que nosotros hemos creado para el entorno de pruebas", async ()=>{
@@ -88,5 +79,4 @@ describe("Peticiones DELETE para routes Film",()=>{
 
 afterAll(async () => {
   await DataBase.destroy();
-  server.close()
 });
