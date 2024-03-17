@@ -8,9 +8,9 @@ const request = supertest(app)
 
 beforeAll(async ()=>{
   await DataBase.initialize()
-  await createFilm()
-  await createPeopleInFilms()
-  await createPeople()
+  await createFilm(100)
+  await createPeopleInFilms(100)
+  await createPeople(100)
 })
 
 describe("GET a la raíz", () => {
@@ -32,9 +32,9 @@ describe("Peticiones GET para routes Film", () => {
     let response = await request.get('/film/1').expect(200)
     expect(response.body.film.characters).toBe(true)
   })
-  test("getFilmsByName - Comprueba que devuelva una lista con 4 resultados", async () => {
+  test("getFilmsByName - Comprueba que devuelva una lista con 5 resultados", async () => {
     let response = await request.get('/film/s/search').query({ searchFilm: 'a'}).expect(200)
-    expect(response.body.results.length).toBe(4)
+    expect(response.body.results.length).toBe(5)
   })
   //4XX
   test("getFilmById - Comprueba que devuelva el error correcto, si se ingresan letras al pedir la lista de personajes de una película por id", async ()=>{
@@ -57,34 +57,37 @@ describe("Peticiones DELETE para routes Film",()=>{
     let response = await request.delete('/film/del/100').expect(200)
     expect(response.body).toHaveProperty("message")
   })
+
   //4XX
+  test("delFilmById - Comprueba que devuelva un error al no encontrar personajes para una película", async () => {
+    await createFilm(99)
+    let response = await request.delete('/film/del/100').expect(404)
+    expect(response.body).toHaveProperty("error")
+    expect(response.body.error).toContain("La película Titulo de película para testing, no tiene personajes asociados para eliminar.")
+  })
   test("delFilmById - Comprueba que devuelva un error al no encontrar una película para eliminar buscando por string", async () => {
     let response = await request.delete('/film/del/qwerty').expect(400)
     expect(response.body).toHaveProperty("error")
     expect(response.body.error).toContain("La solicitud \"qwerty\" es incorrecta.")
-  })
-  test("delFilmById - Comprueba que devuelva un error al no encontrar personajes para una película", async () => {
-    let response = await request.delete('/film/del/2').expect(404)
-    expect(response.body).toHaveProperty("error")
-    expect(response.body.error).toContain("La película The Empire Strikes Back, no tiene personajes asociados para eliminar.")
   })
   test("delFilmById - Comprueba que devuelva un error al no encontrar una película", async () => {
     let response = await request.delete('/film/del/22').expect(404)
     expect(response.body).toHaveProperty("error")
     expect(response.body.error).toContain("La película con id 22 para eliminar, no se encuentra.")
   })
-  // TODO:
-  // delFilmsAll 200 - OK
-  // delFilmsAll 404 - OK res.status(404).json({error:"La base de datos no tiene películas para eliminar."})
-  // Sacar de branch refactor
+  test("delFilmsAll - Comprueba que se eliminen correctamente todas las películas, sus personajes y su asociación.", async () => {
+    let response = await request.delete('/film/s/del/all').expect(200)
+    expect(response.body).toHaveProperty("message")
+    expect(response.body.message).toContain("Las películas se eliminaron correctamente!")
+  })
+  test("delFilmsAll - Comprueba que al ejecutarse solicitar por segunda vez la ruta de eliminación de películas, devuelva un error al encontrarse la base de datos vacía de estas.", async () => {
+    await request.delete('/film/s/del/all')
+    let response = await request.delete('/film/s/del/all').expect(404)
+    expect(response.body).toHaveProperty("error")
+    expect(response.body.error).toContain("La base de datos no tiene películas para eliminar.")
+  })
+  
 })
-
-// TODO: 
-// Test login
-// getLogin
-// getRegister
-// postLogin
-// postRegister
 
 afterAll(async () => {
   await DataBase.destroy();

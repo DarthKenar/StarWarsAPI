@@ -62,7 +62,6 @@ export const delFilmById = async (req:Request, res:Response)=>{
     if(!isNaN(filmId)){
       let filmsRepository = await DataBase.getRepository(Films)
       let film = await filmsRepository.findOneBy({id: filmId})
-      
       if(film){
         let charactersIdsToDelete = await getPeopleIdFromDbWhitFilmId(film.id);
         if(charactersIdsToDelete.length > 0){
