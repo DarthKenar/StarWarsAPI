@@ -13,7 +13,7 @@ beforeAll(async ()=>{
   await createPeople()
 })
 
-describe("GET a la raiz", () => {
+describe("GET a la raíz", () => {
     test("/", async ()=>{
       await request
         .get('/')
@@ -51,24 +51,24 @@ describe("Peticiones GET para routes Film", () => {
   })
 })
 
-describe("Peticiones GET para routes Film",()=>{
+describe("Peticiones DELETE para routes Film",()=>{
   //2XX
-  test("delFilmById - Comprueba que se eliminen los personajes realcionados con una película.", async () => {
+  test("delFilmById - Comprueba que se eliminen los personajes relacionados con una película.", async () => {
     let response = await request.delete('/film/del/100').expect(200)
     expect(response.body).toHaveProperty("message")
   })
   //4XX
-  test("delFilmById - Comprueba que deuelva un error al no encontrar una película para eliminar buscando por string", async () => {
+  test("delFilmById - Comprueba que devuelva un error al no encontrar una película para eliminar buscando por string", async () => {
     let response = await request.delete('/film/del/qwerty').expect(400)
     expect(response.body).toHaveProperty("error")
     expect(response.body.error).toContain("La solicitud \"qwerty\" es incorrecta.")
   })
-  test("delFilmById - Comprueba que deuelva un error al no encontrar personajes para una película", async () => {
+  test("delFilmById - Comprueba que devuelva un error al no encontrar personajes para una película", async () => {
     let response = await request.delete('/film/del/2').expect(404)
     expect(response.body).toHaveProperty("error")
     expect(response.body.error).toContain("La película The Empire Strikes Back, no tiene personajes asociados para eliminar.")
   })
-  test("delFilmById - Comprueba que deuelva un error al no encontrar una película", async () => {
+  test("delFilmById - Comprueba que devuelva un error al no encontrar una película", async () => {
     let response = await request.delete('/film/del/22').expect(404)
     expect(response.body).toHaveProperty("error")
     expect(response.body.error).toContain("La película con id 22 para eliminar, no se encuentra.")
