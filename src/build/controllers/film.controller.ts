@@ -30,7 +30,7 @@ export const getFilmById = async (req:Request, res:Response)=>{
   }
 
 export const getFilmsByName = async (req:Request, res:Response) => {
-    console.log("Parámetro buscado:", req.query.searchFilm)
+    console.log("Nombre de película buscado:", req.query.searchFilm)
     let someFilms:string = String(req.query.searchFilm);
     //https://www.tutorialspoint.com/typeorm/typeorm_query_builder.htm
     //https://typeorm.io/#using-querybuilder
@@ -104,7 +104,6 @@ export const delFilmsAll = async(req:Request,res:Response) =>{
       let films = await filmsRepository.find()
       let peopleInFilms = await peopleInFilmsRepository.find()
       let people = await peopleRepository.find()
-      console.log(films.length === 0 && peopleInFilms.length === 0 && people.length === 0)
       if(films.length === 0 && peopleInFilms.length === 0 && people.length === 0){
         res.status(404).json({error:"La base de datos no tiene películas para eliminar."})
       }else{

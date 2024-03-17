@@ -66,7 +66,7 @@ export async function refillPeopleForThisFilm(res:Response, id:number) {
           await updateFilmCharactersStatus(id,true)
         }
       }catch(err){
-        console.error(err)
+        // console.error(err)
         await updateFilmCharactersStatus(id,false)
       }finally{
         checkingPeopleForThisFilms = checkingPeopleForThisFilms.filter(item => item !== id);
@@ -93,7 +93,7 @@ export async function getPeopleIdFromDbWhitFilmId(id:number):Promise<number[]>{
     let peopleIds = peopleInFilms.map(obj => obj.people_id);
     return peopleIds
   }catch(err){
-    console.error(err)
+    // console.error(err)
     return []
   }
 }
