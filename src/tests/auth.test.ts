@@ -1,12 +1,7 @@
-// TODO: 
-// Test login
-// getLogin //OK
-// getRegister //OK
-// postLogin
-// postRegister
 import supertest from "supertest";
 import app from "../build/app";
 import DataBase from "../database/data-source";
+import { Auth } from "../database/entity/models";
 const request = supertest(app)
 
 beforeAll(async ()=>{
@@ -43,5 +38,6 @@ describe("POST en formularios de registro y autentificación con información de
 })
 
 afterAll(async () => {
+    await DataBase.getRepository(Auth).clear()
     await DataBase.destroy();
 });
