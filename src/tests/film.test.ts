@@ -51,7 +51,7 @@ describe("Peticiones GET para routes Film", () => {
   })
 })
 
-describe("Peticiones GET para routes Film",()=>{
+describe("Peticiones DELETE para routes Film",()=>{
   //2XX
   test("delFilmById - Comprueba que se eliminen los personajes relacionados con una película.", async () => {
     let response = await request.delete('/film/del/100').expect(200)
