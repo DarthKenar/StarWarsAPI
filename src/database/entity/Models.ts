@@ -4,13 +4,13 @@ import { Entity, PrimaryGeneratedColumn, PrimaryColumn, Column} from "typeorm"
 export class Auth {
 
     @PrimaryGeneratedColumn()
-    id: number
+    id: Number
 
     @Column()
-    email: string
+    email: String
 
     @Column()
-    password: number
+    password: String
 
 }
 
