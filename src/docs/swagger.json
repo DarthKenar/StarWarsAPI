@@ -304,7 +304,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
+                  "type": "object",
                   "items": {
                     "$ref": "#/components/schemas/Auth"
                   }
@@ -321,6 +321,17 @@
           "AUTH"
         ],
         "operationId": "postLogin",
+        "requestBody": {
+          "description": "Auth Object",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string",
+                "$ref": "#/components/schemas/Auth"
+              }
+            }
+          }
+        },
         "summary": "Autentifica a un usuario",
         "responses": {
           "200": {
@@ -328,7 +339,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
+                  "type": "string",
                   "items": {
                     "$ref": "#/components/schemas/Auth"
                   }
@@ -342,7 +353,7 @@
   },
   "components": {
     "schemas": {
-      "auth": {
+      "Auth": {
         "type": "object",
         "properties": {
           "id": {
@@ -356,7 +367,7 @@
           },
           "password": {
             "type": "string",
-            "example": "$2b$10$zvP6Tx3aZ5d45zEDIYFBUejS4.fJzY830oO/UKiRXd147T8s24hP2"
+            "example": "encriptadoDB"
           }
         }
       },
