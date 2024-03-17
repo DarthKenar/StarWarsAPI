@@ -46,6 +46,7 @@
         "tags": [
           "FILM"
         ],
+        "operationId": "getFilmById",
         "summary": "Busca todas las películas y las devuelve",
         "description": "Devuelve todas las películas (Las busca en la API si no están en la BD)",
         "responses": {
@@ -73,6 +74,7 @@
         "tags": [
           "FILM"
         ],
+        "operationId": "getFilmsByName",
         "summary": "Busca una o multiples películas por nombre y la/s devuelve.",
         "description": "Devuelve la lista de una o multiples películas.",
         "parameters": [
@@ -111,6 +113,7 @@
         "tags": [
           "FILM"
         ],
+        "operationId": "getFilmsAll",
         "summary": "Busca una película por id y devuelve la misma y su lista de personajes.",
         "description": "Devuelve la película y una lista de los personajes que están en la misma. (Los busca en la API si no están en la BD)",
         "parameters": [
@@ -159,6 +162,7 @@
         "tags": [
           "FILM"
         ],
+        "operationId": "delFilmById",
         "summary": "Elimina todas los personajes relacionados con una película.",
         "description": "Elimina todas los personajes relacionados con una película.",
         "parameters": [
@@ -207,6 +211,7 @@
         "tags": [
           "FILM"
         ],
+        "operationId": "delFilmsAll",
         "summary": "Elimina todas las películas",
         "responses": {
           "200": {
@@ -228,11 +233,36 @@
         }
       }
     },
+    "/auth/register": {
+      "get": {
+        "tags": [
+          "AUTH"
+        ],
+        "operationId": "getRegister",
+        "summary": "Muestra el formulario de registro",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Auth"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/login": {
       "get": {
         "tags": [
           "AUTH"
         ],
+        "operationId": "getLogin",
         "summary": "Muestra el formulario de autentificación",
         "responses": {
           "200": {
@@ -251,12 +281,47 @@
         }
       }
     },
-    "/auth/register": {
-      "get": {
+    "/auth/register/send": {
+      "post": {
         "tags": [
           "AUTH"
         ],
-        "summary": "Muestra el formulario de registro",
+        "operationId": "postRegister",
+        "requestBody": {
+          "description": "Auth Object",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Auth"
+              }
+            }
+          }
+        },
+        "summary": "Registra un usuario",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Auth"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login/send": {
+      "post": {
+        "tags": [
+          "AUTH"
+        ],
+        "operationId": "postLogin",
+        "summary": "Autentifica a un usuario",
         "responses": {
           "200": {
             "description": "successful operation",
