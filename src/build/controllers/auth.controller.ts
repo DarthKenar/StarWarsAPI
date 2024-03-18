@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import {validators} from "../validators/auth.validator"
 import { Auth } from "../../database/entity/models";
 import DataBase from "../../database/data-source";
-import {comparePass as comparePass, encryptPass as encryptPass} from "../utils/auth.utils"
+import {comparePass, encryptPass} from "../utils/auth.utils"
 
 export const getLogin = async (req:Request, res:Response)=>{
     res.json({message:"Bienvenido al Login"})
