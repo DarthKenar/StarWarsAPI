@@ -7,7 +7,7 @@ const AXIOS = require("axios")
 var checkingFilms:boolean = false; //Bandera para que no se repita el rellenado de las películas
 var checkingPeopleForThisFilms:number[] = []; //Bandera para que no se repita el rellenado de los personajes en una película
 
-export async function refillFilmsInDBSync(res:Response){
+export async function refillFilmsInDB(res:Response){
   //Busca las películas en la API externa y las guarda en la DB
   if(!checkingFilms){
     checkingFilms = true;
@@ -23,7 +23,7 @@ export async function refillFilmsInDBSync(res:Response){
         film.id = id
         film.title = filmAPI.title
         film.episode_id = filmAPI.episode_id
-        await updateFilmCharactersStatusSync(id,false)
+        await updateFilmCharactersStatus(id,false)
         await filmRepository.save(film)
         console.log(`Película ${film.title} guardada!`)
       }
@@ -32,9 +32,9 @@ export async function refillFilmsInDBSync(res:Response){
   }
 }
 
-export async function refillPeopleForThisFilmSync(res:Response, id:number) {
+export async function refillPeopleForThisFilm(res:Response, id:number) {
   //Busca los personajes asociados con la película en la API externa y los guarda en la DB
-  let characters = await getPeopleIdFromDbWhitFilmIdSync(id)
+  let characters = await getPeopleIdFromDbWhitFilmId(id)
   if(characters.length === 0){
     if(!checkingPeopleForThisFilms.includes(id)){
       checkingPeopleForThisFilms.push(id)
@@ -56,18 +56,18 @@ export async function refillPeopleForThisFilmSync(res:Response, id:number) {
             people.id = characterIdFromApi
             people.name = characterAPI.data.name
             people.gender = characterAPI.data.gender
-            let species = await getSpecieFromThisUrlSync(res, characterAPI.data.species[0])
+            let species = await getSpecieFromThisUrl(res, characterAPI.data.species[0])
             people.species = species
             peopleRepository.save(people)
             console.log(`Personaje ${people.name} guardado!`)
             peopleInFilms.people_id = people.id
           }
           await DataBase.manager.save(peopleInFilms)
-          await updateFilmCharactersStatusSync(id,true)
+          await updateFilmCharactersStatus(id,true)
         }
       }catch(err){
         // console.error(err)
-        await updateFilmCharactersStatusSync(id,false)
+        await updateFilmCharactersStatus(id,false)
       }finally{
         checkingPeopleForThisFilms = checkingPeopleForThisFilms.filter(item => item !== id);
       }
@@ -75,7 +75,7 @@ export async function refillPeopleForThisFilmSync(res:Response, id:number) {
   }
 }
 
-export async function updateFilmCharactersStatusSync(id:number, status:boolean) {
+export async function updateFilmCharactersStatus(id:number, status:boolean) {
   //Actualiza el estado de film.characters (que determina si tiene o no los personajes asociados guardados en la DB.)
     let filmsRepository = await DataBase.getRepository(Films)
     let film = await filmsRepository.findOneBy({id: id});
@@ -85,7 +85,7 @@ export async function updateFilmCharactersStatusSync(id:number, status:boolean) 
     }
   }
   
-export async function getPeopleIdFromDbWhitFilmIdSync(id:number):Promise<number[]>{
+export async function getPeopleIdFromDbWhitFilmId(id:number):Promise<number[]>{
   //Devuelve una lista de los ID de los personajes asociados al ID de una película.
   try{
     let peopleInFilmsRepository = await DataBase.getRepository(PeopleInFilms)
@@ -98,7 +98,7 @@ export async function getPeopleIdFromDbWhitFilmIdSync(id:number):Promise<number[
   }
 }
   
-export async function getSpecieFromThisUrlSync(res:Response, url:string):Promise<string>{
+export async function getSpecieFromThisUrl(res:Response, url:string):Promise<string>{
   //Devuelve el nombre de la especie obtenida en la API externa
   if(url){
     let species = await AXIOS.get(url)

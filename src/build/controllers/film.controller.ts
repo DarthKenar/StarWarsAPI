@@ -1,18 +1,18 @@
 import { Request, Response } from "express";
 import DataBase from "../../database/data-source";
 import { Films, People, PeopleInFilms} from "../../database/entity/models";
-import { refillFilmsInDBSync, refillPeopleForThisFilmSync,updateFilmCharactersStatusSync, getPeopleIdFromDbWhitFilmIdSync} from "../utils/film.utils"
+import { refillFilmsInDB, refillPeopleForThisFilm,updateFilmCharactersStatus, getPeopleIdFromDbWhitFilmId} from "../utils/film.utils"
 
 export const getFilmById = async (req:Request, res:Response)=>{
     let filmId:number = parseInt(req.params.id)
     if(!isNaN(filmId)){
-      await refillPeopleForThisFilmSync(res,filmId)
+      await refillPeopleForThisFilm(res,filmId)
       let filmsRepository = await DataBase.getRepository(Films)
       let film = await filmsRepository.findOneBy({id: filmId})
       if (film === null) {
         res.status(404).json({error: `No se encontró la película ${req.params.id}.`})
       }else{
-        let peopleIds = await getPeopleIdFromDbWhitFilmIdSync(film.id)
+        let peopleIds = await getPeopleIdFromDbWhitFilmId(film.id)
         let peopleRepository = await DataBase.getRepository(People)
         let characters = await peopleRepository 
           .createQueryBuilder("film")
@@ -48,7 +48,7 @@ export const getFilmsByName = async (req:Request, res:Response) => {
 
 export const getFilmsAll = async (req:Request, res:Response) => {
   try{
-    await refillFilmsInDBSync(res)
+    await refillFilmsInDB(res)
     let filmsRepository = await DataBase.getRepository(Films)
     let films = await filmsRepository.find()
     res.json({results: films})
@@ -63,7 +63,7 @@ export const delFilmById = async (req:Request, res:Response)=>{
       let filmsRepository = await DataBase.getRepository(Films)
       let film = await filmsRepository.findOneBy({id: filmId})
       if(film){
-        let charactersIdsToDelete = await getPeopleIdFromDbWhitFilmIdSync(film.id);
+        let charactersIdsToDelete = await getPeopleIdFromDbWhitFilmId(film.id);
         if(charactersIdsToDelete.length > 0){
           try{
             let peopleRepository = await DataBase.getRepository(People)
@@ -79,7 +79,7 @@ export const delFilmById = async (req:Request, res:Response)=>{
               .from(PeopleInFilms)
               .where("film_id IN (:...filmId)", { filmId })
               .execute();
-            await updateFilmCharactersStatusSync(film.id,false)
+            await updateFilmCharactersStatus(film.id,false)
             let films = await filmsRepository.find()
             res.json({results: films, message: `Los personajes de la película ${film.title} se eliminaron correctamente.`});
           }catch{
