@@ -19,24 +19,35 @@
   },
   "tags": [
     {
-      "name": "FILM",
-      "description": "Películas y personajes de las mismas"
+      "name": "VISTA",
+      "description": "Formularios que no involucran modelos de la base de datos."
     },
     {
       "name": "AUTH",
       "description": "Formularios de Autentificación"
+    },
+    {
+      "name": "FILM",
+      "description": "Películas y personajes de las mismas"
     }
   ],
   "paths": {
     "/": {
       "get": {
         "tags": [
-          "FILM"
+          "VISTA"
         ],
         "description": "Muestra el index",
         "responses": {
           "200": {
-            "description": "Successful operation"
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       }
@@ -49,13 +60,24 @@
         "operationId": "getFilmById",
         "summary": "Busca todas las películas y las devuelve",
         "description": "Devuelve todas las películas (Las busca en la API si no están en la BD)",
+        "parameters":[
+          {
+            "name": "x-access-token",
+            "in": "header",
+            "description": "Token de autentificación",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
+                  "type": "object",
                   "items": {
                     "$ref": "#/components/schemas/Films"
                   }
@@ -64,7 +86,14 @@
             }
           },
           "502": {
-            "description": "Bad Gateway."
+            "description": "Bad Gateway.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       }
@@ -78,6 +107,15 @@
         "summary": "Busca una o multiples películas por nombre y la/s devuelve.",
         "description": "Devuelve la lista de una o multiples películas.",
         "parameters": [
+          {
+            "name": "x-access-token",
+            "in": "header",
+            "description": "Token de autentificación",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "searchFilm",
             "in": "query",
@@ -100,10 +138,24 @@
             }
           },
           "404": {
-            "description": "No se encontraron películas para la búsqueda..."
+            "description": "No se encontraron películas para la búsqueda...",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "502": {
-            "description": "Bad Gateway."
+            "description": "Bad Gateway.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       }
@@ -117,6 +169,15 @@
         "summary": "Busca una película por id y devuelve la misma y su lista de personajes.",
         "description": "Devuelve la película y una lista de los personajes que están en la misma. (Los busca en la API si no están en la BD)",
         "parameters": [
+          {
+            "name": "x-access-token",
+            "in": "header",
+            "description": "Token de autentificación",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "film.id",
             "in": "path",
@@ -146,13 +207,34 @@
             }
           },
           "400": {
-            "description": "La solicitud es incorrecta."
+            "description": "La solicitud es incorrecta.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "404": {
-            "description": "No se encontró la película."
+            "description": "No se encontró la película.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "502": {
-            "description": "Bad Gateway."
+            "description": "Bad Gateway.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       }
@@ -166,6 +248,15 @@
         "summary": "Elimina todas los personajes relacionados con una película.",
         "description": "Elimina todas los personajes relacionados con una película.",
         "parameters": [
+          {
+            "name": "x-access-token",
+            "in": "header",
+            "description": "Token de autentificación",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "film.id",
             "in": "path",
@@ -195,13 +286,34 @@
             }
           },
           "400": {
-            "description": "La solicitud es incorrecta."
+            "description": "La solicitud es incorrecta.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "404": {
-            "description": "La película a eliminar no se encuentra."
+            "description": "La película a eliminar no se encuentra.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "503": {
-            "description": "El servidor no está listo para manejar la petición."
+            "description": "El servidor no está listo para manejar la petición.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       }
@@ -213,6 +325,17 @@
         ],
         "operationId": "delFilmsAll",
         "summary": "Elimina todas las películas",
+        "parameters":[
+          {
+            "name": "x-access-token",
+            "in": "header",
+            "description": "Token de autentificación",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -236,7 +359,7 @@
     "/auth/register": {
       "get": {
         "tags": [
-          "AUTH"
+          "VISTA"
         ],
         "operationId": "getRegister",
         "summary": "Muestra el formulario de registro",
@@ -260,7 +383,7 @@
     "/auth/login": {
       "get": {
         "tags": [
-          "AUTH"
+          "VISTA"
         ],
         "operationId": "getLogin",
         "summary": "Muestra el formulario de autentificación",

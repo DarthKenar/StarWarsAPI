@@ -28,8 +28,8 @@ validation: {
 
 export function validators(email:string, password:string){
 	let validation = {
-		status: true as Boolean, //false, significa que fallo la comprobación de validación
-		messages: [] as String[]
+		status: true as boolean, //false, significa que fallo la comprobación de validación
+		messages: [] as string[]
 	}
 	if(!email.includes("@")){
 		validation.status = false

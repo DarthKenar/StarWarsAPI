@@ -4,6 +4,10 @@ import { Auth } from "../../database/entity/models";
 import DataBase from "../../database/data-source";
 import {comparePass, encryptPass} from "../utils/auth.utils"
 
+require('dotenv').config();
+
+const jwt = require("jsonwebtoken")
+
 export const getLogin = async (req:Request, res:Response)=>{
     res.json({message:"Bienvenido al Login"})
 }
@@ -21,15 +25,21 @@ export const postLogin = async (req:Request, res:Response)=>{
         let userData = await AuthRepository.findOneBy({email})
         if(userData){
             if(await comparePass(password, userData.password)){
-                res.json({message:"El usuario ha ingresado correctamente."})
+                const token = jwt.sign({id: userData.id},process.env.secret,{expiresIn: 60 * 60 * 16})
+                validation.messages.push("El usuario ha ingresado correctamente.")
+                res.json({auth:true, validation, token})
             }else{
-                res.status(401).json({message: "La contraseña ingresada no es correcta."})
+                validation.status = false
+                validation.messages.push("La contraseña ingresada no es correcta.")
+                res.status(400).json({validation})
             }
         }else{
-            res.status(401).json({message: "No existe un usuario con ese correo electrónico."})
+            validation.status = false
+            validation.messages.push("No existe un usuario con ese correo electrónico.")
+            res.status(400).json({validation})
         }
     }else{
-        res.status(401).json({validation})
+        res.status(400).json({validation})
     }
 }
 
@@ -51,6 +61,6 @@ export const postRegister = async (req:Request, res:Response)=>{
             res.status(403).json(validation)
         }
     }else{
-        res.status(401).json({validation})
+        res.status(400).json({validation})
     }
 }
