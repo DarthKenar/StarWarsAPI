@@ -80,27 +80,34 @@ ProjectRoot
 ├── src              				// Carpeta de codigo fuente.
 │   ├── build       				// Carpeta de compilación.
 │   │   └── controllers  	 		// Carpeta contenedora de los controladores de las rutas.
-│   │   │   └── film.controller.ts  // Controladores de las rutas para film.
+│   │   │   └── auth.controller.ts  // Controladores de las rutas para film.
+│   │   │   └── film.controller.ts  // Controladores de las rutas para auth.
 │   │   └── routes  	 			// Carpeta de rutas de la API.
+│   │   │   └── auth.routes.ts     	// Rutas definidas para el modelo Auth.
 │   │   │   └── film.routes.ts     	// Rutas definidas para el modelo Film.
 │   │   └── utils	                // Carpeta contenedora de funciones útiles.
-│   │   │   └── film.utils.ts	    // funciones útiles para film.routes.ts.
-│   │   └── app.ts  				// Archivo de centralizacion de rutas.
-│   │   └── index.ts  				// Archivo de ejecucion del servidor.
+│   │   │   └── auth.utils.ts	    // funciones útiles para auth.controller.ts.
+│   │   │   └── film.utils.ts	    // funciones útiles para film.controller.ts.
+│   │   └── validators  	 		// Carpeta contenedora de los controladores de las rutas.
+│   │   │   └── auth.validator.ts	// validadores para auth.controller.ts.
+│   │   └── app.ts  				// Archivo de centralización de rutas.
+│   │   └── index.ts  				// Archivo de ejecución del servidor.
 │   ├── database  				    // Carpeta referente a la base de datos.
 │   │   └── entity  	 			// Carpeta contenedora de los modelos.
 │   │   │   └── models.ts	        // archivo de definición de los modelos de la base de datos.
 │   │   └── data-source.ts  		// Archivo de configuración de la base de datos.
 │   ├── docs  				        // Carpeta referente a la documentación.
 │   │   └── models.mmd     		    // Diagrama de modelos realizado en mermaidchart
-│   │   └── swagger.json     		// archivo de configuracion para documentación en Swagger
+│   │   └── swagger.json     		// archivo de configuración para documentación en Swagger
 │   ├── tests  				        // Carpeta referente a los tests.
-│   │   └── server.test.ts     		// Testeo de peticiones definidas en el archivo server.ts
+│   │   └── auth.test.ts     		// Testing de funciones utilizadas por los módulos auth.ts
+│   │   └── base.test.ts     		// Testing de funciones independientes y sín módulo. (ej. petición a la raíz "/")
+│   │   └── film.test.ts     		// Testing de funciones utilizadas por los módulos film.ts
 ├── .gitignore       				// Archivo gitignore estándar.
-├── package-lock.json     		    // Dependencias de modulos exactos de Node.js
-├── package.json     				// Dependencias de modulos de Node.js
+├── package-lock.json     		    // Dependencias de librerías exactas de Node.js
+├── package.json     				// Dependencias de librerías de Node.js
 ├── README.md                       // Archivo Readme.md estándar.
-└── tsconfig.json    				// Configuracion para compilacion de Typescript
+└── tsconfig.json    				// Configuración para compilación de Typescript
 ```
 
 # Project Dependencies 
@@ -109,15 +116,21 @@ ProjectRoot
 
 1. "axios": "^1.6.7",
 
-2. "express": "^4.18.2",
+2. "bcrypt": "^5.1.1",
 
-3. "reflect-metadata": "^0.2.1",
+3. "cross-env": "^7.0.3",
 
-4. "sqlite3": "^5.1.7",
+4. "dotenv": "^16.4.5",
 
-5. "swagger-ui-express": "^5.0.0",
+5. "express": "^4.18.2",
 
-6. "typeorm": "^0.3.20"
+6. "reflect-metadata": "^0.2.1",
+
+7. "sqlite3": "^5.1.7",
+
+8. "swagger-ui-express": "^5.0.0",
+
+9.  "typeorm": "^0.3.20"
 
 **Dev Dependencies** 
 
@@ -127,15 +140,17 @@ ProjectRoot
 
 3. "@types/node": "^20.11.24",
 
-4. "jest": "^29.7.0",
+4. "@types/supertest": "^6.0.2",
 
-5. "nodemon": "^3.1.0",
+5. "jest": "^29.7.0",
 
-6. "ts-jest": "^29.1.2",
+6. "nodemon": "^3.1.0",
 
-7. "supertest": "^6.3.4",
+7. "ts-jest": "^29.1.2",
 
-8. "typescript": "^5.3.3"
+8. "supertest": "^6.3.4",
+
+9.  "typescript": "^5.3.3"
 
 ## Objetivos
 
