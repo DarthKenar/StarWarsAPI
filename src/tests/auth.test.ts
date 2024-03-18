@@ -33,8 +33,8 @@ describe("POST en formularios de registro y autentificación con información de
     test("postLogin - /auth/login", async ()=>{
         let response = await request.post('/auth/login/send').send({email: 'john@gmail.com',password: 'cabezón1234'})
         expect(200)
-        expect(response.body).toHaveProperty("message")
-        expect(response.body.message).toContain("El usuario ha ingresado correctamente.")
+        expect(response.body).toHaveProperty("validation")
+        expect(response.body.validation.status).toBe(true)
     })
 })
 

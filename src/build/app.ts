@@ -5,6 +5,8 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('../../src/docs/swagger.json');
 const app = express()
 
+import { verifyToken } from './controllers/verifyToken';
+
 //https://editor.swagger.io/
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -21,7 +23,7 @@ app.use(express.json());
 
 //Routers
 const routerFilm = require('./routes/film.routes');
-app.use('/film', routerFilm);
+if(process.env.NODE_ENV="test"){app.use('/film', routerFilm)}else{app.use('/film',verifyToken, routerFilm)}
 
 const routerAuth = require('./routes/auth.routes');
 app.use('/auth', routerAuth);
