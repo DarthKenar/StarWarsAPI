@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import {validators} from "../validators/auth.validator"
 import { Auth } from "../../database/entity/models";
 import DataBase from "../../database/data-source";
-import {comparePassSync, encryptPassSync} from "../utils/auth.utils"
+import {comparePass, encryptPass} from "../utils/auth.utils"
 
 export const getLogin = async (req:Request, res:Response)=>{
     res.json({message:"Bienvenido al Login"})
@@ -20,7 +20,7 @@ export const postLogin = async (req:Request, res:Response)=>{
         let AuthRepository = DataBase.getRepository(Auth)
         let userData = await AuthRepository.findOneBy({email})
         if(userData){
-            if(await comparePassSync(password, userData.password)){
+            if(await comparePass(password, userData.password)){
                 res.json({message:"El usuario ha ingresado correctamente."})
             }else{
                 res.status(401).json({message: "La contraseña ingresada no es correcta."})
@@ -43,7 +43,7 @@ export const postRegister = async (req:Request, res:Response)=>{
         if(!userData){
             let newUser = new Auth
             newUser.email = email
-            newUser.password = await encryptPassSync(password)
+            newUser.password = await encryptPass(password)
             AuthRepository.save(newUser)
             res.json({message:"El usuario se ha registrado correctamente."})
         }else{
