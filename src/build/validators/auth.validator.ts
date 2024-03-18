@@ -26,7 +26,7 @@ validation: {
 
 */
 
-export function validators(email:String, password:String){
+export function validators(email:string, password:string){
 	let validation = {
 		status: true as Boolean, //false, significa que fallo la comprobación de validación
 		messages: [] as String[]
@@ -38,6 +38,10 @@ export function validators(email:String, password:String){
 	if(password.length < 8){
 		validation.status = false
 		validation.messages.push("La contraseña tiene que tener al menos 8 caracteres.")
+	}
+	if(!/^(?=.*\d).+$/.test(password)){
+		validation.status = false
+		validation.messages.push("La contraseña tiene que tener al menos 1 número.")
 	}
 	return validation
 }

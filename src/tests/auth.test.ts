@@ -22,6 +22,7 @@ describe("GET a formularios de registro y autentificación", () => {
         .expect(200)
     })
 })
+
 describe("POST en formularios de registro y autentificación con información del usuario", () => {
     test("postRegister - /auth/register/send", async ()=>{
         let response = await request.post("/auth/register/send").send({email: 'john@gmail.com',password: 'cabezón1234'})
