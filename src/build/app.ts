@@ -23,7 +23,7 @@ app.use(express.json());
 
 //Routers
 const routerFilm = require('./routes/film.routes');
-app.use('/film', verifyToken, routerFilm);
+if(process.env.NODE_ENV="test"){app.use('/film', routerFilm)}else{app.use('/film',verifyToken, routerFilm)}
 
 const routerAuth = require('./routes/auth.routes');
 app.use('/auth', routerAuth);

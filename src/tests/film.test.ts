@@ -11,6 +11,7 @@ beforeAll(async ()=>{
   await createFilm(100)
   await createPeopleInFilms(100)
   await createPeople(100)
+  await request.post('/auth/login/send').send({email: 'john@gmail.com',password: 'cabezón1234'})
 })
 
 describe("Peticiones GET para routes Film", () => {
