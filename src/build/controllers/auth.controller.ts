@@ -19,7 +19,7 @@ export const getRegister = async (req:Request, res:Response)=>{
 export const postLogin = async (req:Request, res:Response)=>{
     let email:string = req.body.email
     let password:string = req.body.password
-    let validation = await validators(email, password)
+    let validation = validators(email, password)
     if(validation.status === true){
         let AuthRepository = DataBase.getRepository(Auth)
         let userData = await AuthRepository.findOneBy({email})
