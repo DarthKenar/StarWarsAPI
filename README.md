@@ -48,7 +48,7 @@ http://localhost:3000/api-docs
 
 ## Modelos - Base de Datos
 
-[Diagrama](./src/doc/models.mmd)
+[Diagrama](./src/docs/models.mmd)
 
 ---
 ## API Routes
